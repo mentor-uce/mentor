@@ -8,3 +8,5 @@
 /.github/           @sarithmijal
 Dockerfile          @sarithmijal
 .dockerignore       @sarithmijal
+docker-compose*.yml @sarithmijal
+/docker/            @sarithmijal
