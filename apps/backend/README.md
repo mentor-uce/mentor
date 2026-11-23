@@ -12,7 +12,19 @@ Part of **Mentor – Learn and teach among peers**, a peer-tutoring web platform
 
 **Owner:** Alquinga Cristopher (@Cristopher2912)
 
-## Tech stack
+## Current implementation (MEN-11)
+
+- Java 21 and Spring Boot 4.2.0
+- Spring MVC with an embedded HTTP server
+- Maven 3.10.1 through the checked-in Maven Wrapper
+- An automated Spring application context startup test
+
+The base application starts without databases, Keycloak or payment credentials.
+Business modules, health checks, Swagger and external integrations belong to
+their respective Jira tasks. Visiting `/` currently returns HTTP 404 because
+no business routes exist yet.
+
+## Target tech stack
 
 - Java 21 + Spring Boot
 - Spring Security as an OAuth 2.0 resource server (validates the Keycloak JWT and applies roles)
@@ -20,7 +32,7 @@ Part of **Mentor – Learn and teach among peers**, a peer-tutoring web platform
 - WebSocket (STOMP) for chat, live status and WebRTC signaling
 - Spring Data JPA (PostgreSQL + pgvector), Spring Data MongoDB and Spring Data Redis
 - Spring Boot Actuator (`/actuator/health` is used by the Docker health check)
-- JUnit 5 and Mockito for tests
+- JUnit Jupiter and Mockito for tests (versions managed by Spring Boot)
 - Maven as the build tool
 
 ## Planned modules
@@ -29,16 +41,54 @@ Auth, Users, Services, Schedules, Bookings, Sessions, Payments, Messaging, Video
 
 ## Getting started
 
-1. Create the base project with [Spring Initializr](https://start.spring.io) (Maven, Java 21) **in the root of this repository**, so that `pom.xml` is next to this README.
-2. Start the databases and Keycloak with the Docker Compose file of the [mentor](https://github.com/mentor-uce/mentor) repository.
-3. Copy `.env.example` to `.env` and fill in the values (never commit `.env`).
+Run the commands from the root of `mentor-backend`, where `pom.xml` lives.
 
-```bash
-./mvnw spring-boot:run   # run locally on http://localhost:8080
-./mvnw verify            # build and run the tests
+### Prerequisites
+
+- JDK 21; `java -version` must report version 21.
+- `JAVA_HOME` pointing to that JDK and its `bin` directory on `PATH`.
+- Internet access on the first build to download Maven and dependencies.
+
+Maven does not need a separate installation: the Maven Wrapper downloads its
+pinned version on first use.
+
+### Windows (PowerShell)
+
+```powershell
+.\mvnw.cmd -v                  # confirm Maven and Java versions
+.\mvnw.cmd clean verify        # compile, run tests and package the application
+.\mvnw.cmd spring-boot:run     # run locally on port 8080
 ```
 
-The `Dockerfile` builds the application with Maven and runs it on port 8080.
+### Linux / macOS
+
+```bash
+./mvnw -v
+./mvnw clean verify
+./mvnw spring-boot:run
+```
+
+### Run the packaged application
+
+After a successful build:
+
+```bash
+java -jar target/mentor-backend-0.0.1-SNAPSHOT.jar
+```
+
+The default port is `8080`. Set `SERVER_PORT` or pass `--server.port=8082` to
+change it. Stop the application with `Ctrl+C`.
+
+The application needs no service credentials or application-specific environment
+variables for this base local run. The `.env.example` file documents future
+integrations; Spring Boot does not automatically load it during a direct run.
+When those integrations are implemented, start their infrastructure using the
+Docker Compose file in the shared [mentor](https://github.com/mentor-uce/mentor)
+repository. Never commit `.env` files or real credentials.
+
+The existing `Dockerfile` builds the application with Maven and runs the JAR on
+port 8080. The `/actuator/health` endpoint is not provided by MEN-11; health checks
+are part of MEN-12.
 
 ## Branches and workflow
 
