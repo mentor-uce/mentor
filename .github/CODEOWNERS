@@ -1,0 +1,10 @@
+# Code owners are automatically requested for review on Pull Requests.
+# The last matching pattern takes precedence.
+
+# Backend code
+*                   @Cristopher2912 @Kevin-Moyon
+
+# CI/CD, Docker and repository configuration (DevOps)
+/.github/           @sarithmijal
+Dockerfile          @sarithmijal
+.dockerignore       @sarithmijal
