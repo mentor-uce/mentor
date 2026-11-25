@@ -88,7 +88,7 @@ repository. Never commit `.env` files or real credentials.
 
 The existing `Dockerfile` builds the application with Maven and runs the JAR on
 port 8080. The `/actuator/health` endpoint is not provided by MEN-11; health checks
-are part of MEN-12.
+are part of MEN-13.
 
 ## Branches and workflow
 
