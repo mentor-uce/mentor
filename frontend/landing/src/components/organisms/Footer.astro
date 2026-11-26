@@ -1,46 +1,47 @@
 ---
+/**
+ * Footer Organism
+ *
+ * Implements the global footer strictly adhering to:
+ * - Background color: Noche (#0B1220)
+ * - Text color: Slate-300 / Slate-400 with Cielo (#38BDF8) hover states
+ * - Brand Manual Isotype + Wordmark + Tagline
+ * - Clear identification of Universidad Central del Ecuador & academic project context
+ */
 import Container from '../atoms/Container.astro';
-import Icon from '../atoms/Icon.astro';
+import MentorLogo from '../atoms/MentorLogo.astro';
 
 const navLinks = [
-  { href: '#top', label: 'Home' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#benefits', label: 'Benefits' },
-  { href: '#trust', label: 'Trust & Security' },
-  { href: '#faq', label: 'FAQ' },
+  { href: '#top', label: 'Inicio' },
+  { href: '#problem', label: 'El Reto' },
+  { href: '#how-it-works', label: 'Cómo Funciona' },
+  { href: '#benefits', label: 'Beneficios' },
+  { href: '#trust', label: 'Confianza y Seguridad' },
+  { href: '#faq', label: 'Preguntas Frecuentes' },
 ];
 
 const legalLinks = [
-  { href: '#terms', label: 'Terms & Conditions (Academic Placeholder)' },
-  { href: '#privacy', label: 'Privacy Policy (Academic Placeholder)' },
+  { href: '#terms', label: 'Términos y Condiciones (Entorno Académico)' },
+  { href: '#privacy', label: 'Política de Privacidad (Entorno Académico)' },
 ];
 ---
 
 <footer class="bg-mentor-night text-slate-400 py-12 md:py-16 border-t border-slate-800">
   <Container>
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-slate-800">
-      <!-- Col 1: Brand & UCE Identification -->
+      <!-- Col 1: Brand & Institutional Identity -->
       <div class="md:col-span-5 space-y-4">
-        <div class="flex items-center gap-2.5">
-          <div
-            class="w-8 h-8 rounded-lg bg-gradient-ribbon flex items-center justify-center text-white"
-          >
-            <Icon name="academic-cap" class="w-4 h-4" />
-          </div>
-          <span class="font-heading font-bold text-xl text-white tracking-tight">
-            Mentor
-          </span>
-        </div>
+        <MentorLogo variant="horizontal" theme="color-on-dark" isotypeSize={34} />
 
-        <p class="text-sm text-slate-300 leading-relaxed max-w-sm">
-          Academic peer-to-peer tutoring network designed for Universidad Central del Ecuador. Teaching is also learning.
+        <p class="text-sm text-slate-300 leading-relaxed max-w-sm pt-2">
+          Plataforma de tutorías académicas entre pares diseñada para la Universidad Central del Ecuador. Enseñar también es aprender.
         </p>
 
         <div class="pt-2">
           <span
             class="inline-block px-3 py-1 rounded-md text-xs font-medium bg-slate-800 text-mentor-sky border border-slate-700"
           >
-            Universidad Central del Ecuador • Software Architecture 2026
+            Universidad Central del Ecuador • Arquitectura de Software 2026
           </span>
         </div>
       </div>
@@ -48,7 +49,7 @@ const legalLinks = [
       <!-- Col 2: Navigation Links -->
       <div class="md:col-span-3 space-y-3">
         <h4 class="text-sm font-semibold font-heading text-white uppercase tracking-wider">
-          Navigation
+          Navegación
         </h4>
         <ul class="space-y-2 text-sm">
           {
@@ -56,7 +57,7 @@ const legalLinks = [
               <li>
                 <a
                   href={link.href}
-                  class="hover:text-mentor-sky transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-mentor-sky rounded"
+                  class="hover:text-mentor-sky transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-mentor-sky rounded py-0.5 inline-block"
                 >
                   {link.label}
                 </a>
@@ -66,25 +67,25 @@ const legalLinks = [
         </ul>
       </div>
 
-      <!-- Col 3: Academic Project Notice -->
+      <!-- Col 3: Academic Framework Notice -->
       <div class="md:col-span-4 space-y-3">
         <h4 class="text-sm font-semibold font-heading text-white uppercase tracking-wider">
-          Academic Framework
+          Marco del Proyecto
         </h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Developed as part of the Software Architecture curriculum. This landing page is statically generated with Astro and styled with Tailwind CSS according to the Mentor Design System.
+          Desarrollado como proyecto para las asignaturas de Arquitectura de Software y Programación en Inglés. Implementado con Astro en modo estático (SSG), Tailwind CSS y el Sistema de Diseño oficial de Mentor.
         </p>
         <p class="text-xs text-slate-500">
-          All university brand trademarks belong to Universidad Central del Ecuador.
+          Todas las marcas y signos distintivos universitarios pertenecen a la Universidad Central del Ecuador.
         </p>
       </div>
     </div>
 
-    <!-- Bottom Legal & Copyright -->
+    <!-- Bottom Legal & Copyright Notice -->
     <div
       class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500"
     >
-      <p>© 2026 Mentor Project. All rights reserved.</p>
+      <p>© 2026 Proyecto Mentor - UCE. Todos los derechos reservados.</p>
 
       <ul class="flex flex-wrap gap-4 sm:gap-6">
         {

@@ -1,17 +1,28 @@
 ---
+/**
+ * HeroSection Organism
+ *
+ * Implements the primary Hero presentation for Mentor adhering strictly to:
+ * - Brand manual color proportions (Noche, Hielo, Cielo, Índigo, Turquesa)
+ * - Brand Manual Display Typography: Poppins Bold 48px (-3% letter spacing)
+ * - Tagline: "Enseñar también es aprender"
+ * - Card preview simulating the official application interface from page 08 of the Brand Manual
+ * - Calls to Action: "Registrarme con @uce.edu.ec" & "Cómo funciona"
+ */
 import Button from '../atoms/Button.astro';
 import Container from '../atoms/Container.astro';
 import Icon from '../atoms/Icon.astro';
+import MentorLogo from '../atoms/MentorLogo.astro';
 ---
 
-<section id="top" class="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 bg-gradient-to-b from-mentor-ice/40 via-white to-white">
-  <!-- Subtle decorative ambient glows -->
+<section id="top" class="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 bg-gradient-to-b from-mentor-ice/60 via-white to-white">
+  <!-- Subtle decorative ambient glows based on Cielo & Turquesa palette -->
   <div
-    class="absolute top-0 right-1/4 -z-10 w-96 h-96 bg-mentor-sky/10 rounded-full blur-3xl pointer-events-none"
+    class="absolute top-0 right-1/4 -z-10 w-96 h-96 bg-mentor-sky/15 rounded-full blur-3xl pointer-events-none"
     aria-hidden="true"
   ></div>
   <div
-    class="absolute top-1/3 left-10 -z-10 w-80 h-80 bg-mentor-turquoise/10 rounded-full blur-3xl pointer-events-none"
+    class="absolute top-1/3 left-10 -z-10 w-80 h-80 bg-mentor-turquoise/15 rounded-full blur-3xl pointer-events-none"
     aria-hidden="true"
   ></div>
 
@@ -22,32 +33,32 @@ import Icon from '../atoms/Icon.astro';
         <!-- Brand Tagline Badge -->
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-mentor-sky/30 shadow-sm mb-6">
           <span class="w-2 h-2 rounded-full bg-mentor-sky animate-pulse"></span>
-          <span class="text-xs font-semibold text-mentor-night uppercase tracking-wider">
-            Teaching Is Also Learning
+          <span class="text-xs font-semibold text-mentor-night tracking-wider uppercase">
+            Enseñar también es aprender
           </span>
         </div>
 
-        <!-- Main Headline -->
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-heading text-mentor-night tracking-tight leading-[1.1] mb-6">
-          Learn and Teach <br class="hidden sm:inline" />
+        <!-- Main Display Headline (Poppins Bold 48px -3%) -->
+        <h1 class="text-4xl sm:text-5xl lg:text-[52px] font-extrabold font-heading text-mentor-night tracking-tight leading-[1.15] mb-6">
+          Tu próxima tutoría <br class="hidden sm:inline" />
           <span class="bg-gradient-ribbon bg-clip-text text-transparent">
-            Together
+            está muy cerca
           </span>
         </h1>
 
-        <!-- Subtitle & Value Proposition -->
-        <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
-          The official peer-tutoring network for Universidad Central del Ecuador. Overcome challenging courses with guidance from top students, or share your knowledge as a peer tutor.
+        <!-- Subtitle: Inter Regular 16px 150% line-height -->
+        <p class="text-base sm:text-lg text-slate-700 max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
+          Aprende con compañeros verificados y llega preparado a tu próxima clase. La plataforma oficial de tutorías académicas entre pares para la comunidad de la <strong class="text-mentor-night">Universidad Central del Ecuador</strong>.
         </p>
 
         <!-- CTA Actions -->
         <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
           <Button href="#register" variant="primary" size="lg" class="w-full sm:w-auto shadow-md">
-            <span>Get Started with @uce.edu.ec</span>
+            <span>Registrarme con @uce.edu.ec</span>
             <Icon name="arrow-right" class="w-4 h-4 ml-1" />
           </Button>
           <Button href="#how-it-works" variant="outline" size="lg" class="w-full sm:w-auto">
-            <span>Explore How It Works</span>
+            <span>Ver cómo funciona</span>
           </Button>
         </div>
 
@@ -55,83 +66,106 @@ import Icon from '../atoms/Icon.astro';
         <div class="pt-6 border-t border-slate-200/80 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-left">
           <div>
             <p class="font-heading font-bold text-lg text-mentor-night">100%</p>
-            <p class="text-xs text-slate-500">UCE Verified</p>
+            <p class="text-xs text-slate-500">Verificado UCE</p>
           </div>
           <div>
-            <p class="font-heading font-bold text-lg text-mentor-night">Peer-to-Peer</p>
-            <p class="text-xs text-slate-500">Student Mentors</p>
+            <p class="font-heading font-bold text-lg text-mentor-night">Entre Pares</p>
+            <p class="text-xs text-slate-500">Tutor y Estudiante</p>
           </div>
           <div>
-            <p class="font-heading font-bold text-lg text-mentor-night">Zero Risk</p>
-            <p class="text-xs text-slate-500">Safe Test Flow</p>
+            <p class="font-heading font-bold text-lg text-mentor-night">Seguro</p>
+            <p class="text-xs text-slate-500">Código de finalización</p>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Academic Collaboration Visual Card -->
+      <!-- Right Column: Interactive App Interface Preview based on Manual de Marca Page 08 -->
       <div class="lg:col-span-5 relative">
-        <div class="relative mx-auto max-w-md lg:max-w-none bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xl">
-          <!-- Top Accent Ribbon -->
-          <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-ribbon rounded-t-2xl"></div>
-
-          <!-- Card Header -->
-          <div class="flex items-center justify-between pb-5 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-mentor-ice flex items-center justify-center text-mentor-deep-turquoise font-bold">
-                <Icon name="book-open" class="w-5 h-5" />
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase text-mentor-deep-turquoise tracking-wider">Active Session</p>
-                <h4 class="font-heading font-bold text-sm text-mentor-night">Calculus & Linear Algebra</h4>
-              </div>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Confirmed
+        <div class="relative mx-auto max-w-[340px] sm:max-w-[360px] bg-mentor-night text-white rounded-3xl shadow-2xl p-4 sm:p-5 border border-slate-700/80">
+          <!-- App Header inside device mockup -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <MentorLogo variant="horizontal" theme="color-on-dark" isotypeSize={28} showTagline={false} />
+            <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-mentor-sky border border-slate-700">
+              UCE App
             </span>
           </div>
 
-          <!-- Interactive Snippet: Tutor & Student Interaction -->
-          <div class="py-5 space-y-4">
-            <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
-              <div class="w-8 h-8 rounded-full bg-mentor-indigo/15 text-mentor-indigo flex items-center justify-center font-bold text-xs shrink-0">
-                T
-              </div>
-              <div class="text-xs space-y-1">
-                <p class="font-semibold text-mentor-night">Peer Tutor (Semester 8)</p>
-                <p class="text-slate-600">"We will solve last semester's exam problems and clarify differential equations."</p>
+          <!-- Greeting -->
+          <div class="pt-4 pb-3">
+            <p class="text-xs text-slate-400">Hola,</p>
+            <h3 class="font-heading font-bold text-base text-white">¿Qué quieres aprender hoy?</h3>
+          </div>
+
+          <!-- Card Content (Simulating Brand Manual Page 08) -->
+          <div class="bg-white text-mentor-night rounded-2xl p-4 shadow-lg space-y-4">
+            <!-- Subject Header -->
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1">Materia</p>
+              <div class="flex items-center justify-between">
+                <h4 class="font-heading font-bold text-lg text-mentor-night">Cálculo I</h4>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-mentor-sky/20 text-mentor-deep-turquoise">
+                    Presencial
+                  </span>
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-mentor-indigo/20 text-mentor-indigo">
+                    Online
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div class="flex items-start gap-3 p-3 rounded-lg bg-mentor-ice/40 border border-mentor-sky/20">
-              <div class="w-8 h-8 rounded-full bg-mentor-sky/20 text-mentor-night flex items-center justify-center font-bold text-xs shrink-0">
-                S
+            <!-- Tutor Card Details -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-mentor-indigo text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                  AM
+                </div>
+                <div>
+                  <h5 class="font-heading font-bold text-sm text-mentor-night">Ana Morales</h5>
+                  <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                    Tutor verificado • <span class="text-amber-500 font-semibold flex items-center"><Icon name="star" class="w-3 h-3 inline mr-0.5" /> 4.9</span>
+                  </p>
+                </div>
               </div>
-              <div class="text-xs space-y-1">
-                <p class="font-semibold text-mentor-night">Student (Semester 2)</p>
-                <p class="text-slate-600">"Session confirmed! Looking forward to reviewing the theorem demonstrations."</p>
+            </div>
+
+            <!-- Availability & Rates -->
+            <div class="p-2.5 rounded-xl bg-mentor-ice/50 border border-mentor-sky/20 flex items-center justify-between text-xs">
+              <div>
+                <span class="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  Disponible hoy 16:00
+                </span>
+                <p class="text-[11px] text-slate-600 mt-1">Cálculo I • 60 min • Aula FIE-204</p>
               </div>
+              <p class="font-heading font-bold text-mentor-indigo text-sm">$4,00 <span class="text-[10px] text-slate-500 font-normal">/hora</span></p>
+            </div>
+
+            <!-- Action Buttons inside Mockup -->
+            <div class="space-y-2 pt-1">
+              <button class="w-full py-2.5 px-4 rounded-xl bg-gradient-ribbon text-white font-semibold text-xs text-center shadow-md hover:brightness-105 transition-all">
+                Solicitar tutoría
+              </button>
+              <button class="w-full py-2 px-4 rounded-xl border border-mentor-indigo/30 text-mentor-indigo font-medium text-xs text-center hover:bg-mentor-ice/40 transition-all">
+                Chatear con el tutor
+              </button>
             </div>
           </div>
 
-          <!-- Bottom Metric & Verification Pill -->
-          <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <div class="flex items-center gap-1.5 text-mentor-deep-turquoise font-medium">
-              <Icon name="shield-check" class="w-4 h-4" />
-              <span>Verified @uce.edu.ec Student</span>
-            </div>
-            <div class="flex items-center gap-1 text-amber-500 font-semibold">
-              <Icon name="star" class="w-3.5 h-3.5" />
-              <span>5.0 Rating</span>
-            </div>
+          <!-- Bottom Micro Notice -->
+          <div class="pt-3 flex items-center justify-between text-[11px] text-slate-400">
+            <span class="flex items-center gap-1 text-mentor-turquoise">
+              <Icon name="shield-check" class="w-3.5 h-3.5" />
+              Verificación @uce.edu.ec
+            </span>
+            <span>Entorno seguro</span>
           </div>
         </div>
 
         <!-- Floating Badge: Dual Role Support -->
         <div class="hidden sm:flex absolute -bottom-5 -left-4 items-center gap-2.5 bg-mentor-night text-white px-4 py-2.5 rounded-xl shadow-lg border border-slate-700">
-          <div class="w-2.5 h-2.5 rounded-full bg-mentor-turquoise"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-mentor-turquoise animate-pulse"></div>
           <p class="text-xs font-medium">
-            Learn as student • Teach as tutor
+            Aprende como estudiante • Enseña como tutor
           </p>
         </div>
       </div>
