@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "mentor.cors.allowed-origins=http://localhost:5173,http://127.0.0.1:5173")
-@Import(PostgreSqlTestConfiguration.class)
+@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class})
 class BackendHttpSmokeTests {
 
     private final HttpClient client = HttpClient.newBuilder()

@@ -20,9 +20,10 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Configurable API CORS and optional local-profile `.env` import
 - Spring Data JPA and PostgreSQL connection configured through environment variables
 - Flyway startup migrations with SQL checksum validation
+- Spring Data MongoDB with an authenticated connection and health integration
 - HTTP smoke and startup connectivity tests against temporary PostgreSQL containers
 
-The application now requires a reachable PostgreSQL database and its credentials. Keycloak and payment integrations remain planned.
+Healthy operation now requires reachable PostgreSQL and MongoDB databases and their credentials. Keycloak and payment integrations remain planned.
 Business modules and external integrations remain in their respective Jira tasks. The root `/` remains unmapped; use `/api/v1/hello` for an API check.
 
 ## Target tech stack
@@ -107,7 +108,7 @@ For local runs, copy `.env.example` to `.env` if it does not already exist,
 set `POSTGRES_PASSWORD` and activate the `local` profile. This imports the
 optional `.env` from the process working directory. Use `KEY=value` syntax
 without shell quoting or `export`. Real process environment variables take precedence.
-Start PostgreSQL before running the API; see MEN-16 below.
+Start PostgreSQL and MongoDB before running the API; see MEN-16 and MEN-18 below.
 Never commit `.env` files or real credentials.
 
 The existing `Dockerfile` builds the application with Maven and runs the JAR on
@@ -167,7 +168,7 @@ Socket.IO will have its own origin policy when implemented.
 Health and documentation are public for this bootstrap task. The Keycloak
 security task must apply the agreed environment/role policy for documentation
 and business routes; it must not expose additional management endpoints.
-Health now includes PostgreSQL connectivity in its aggregate status, while component details stay hidden. Other provider connectivity remains outside this task.
+Health now includes PostgreSQL and MongoDB connectivity in its aggregate status, while component details stay hidden. Other provider connectivity remains outside this task.
 
 ```powershell
 Invoke-RestMethod http://localhost:8080/actuator/health
@@ -198,8 +199,8 @@ For local Compose, also fill the other required password placeholders in
 From `backend/`:
 
 ```bash
-docker compose up -d postgres
-docker compose ps postgres
+docker compose up -d postgres mongo
+docker compose ps postgres mongo
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
@@ -257,6 +258,53 @@ configured database, not those other databases.
 `mvn verify` includes a real PostgreSQL startup assertion that V1 was successfully
 recorded, alongside the connection and HTTP tests. Docker is required.
 Reference: [Spring Boot migration initialization](https://docs.spring.io/spring-boot/how-to/data-initialization.html).
+
+## MongoDB connection and ping (MEN-18)
+
+Spring Data MongoDB uses the synchronous driver, with versions managed by Spring
+Boot. Connection properties in Boot 4 use `spring.mongodb.*`; the former
+`SPRING_DATA_MONGODB_URI` setting is not used. For direct local runs, set these
+values in the ignored `.env` and activate the `local` Spring profile:
+
+| Variable | Purpose / default |
+| --- | --- |
+| `MONGO_HOST` | Server host; `localhost`. Compose overrides it with `mongo`. |
+| `MONGO_PORT` | Server port; `27017`. |
+| `MONGO_DB` | Application database; `mentor`. |
+| `MONGO_USER` | Login user; `mentor`. Local Compose creates this root test user. |
+| `MONGO_PASSWORD` | Required local password; no supplied secret. |
+| `MONGO_AUTH_DATABASE` | Database holding the user's credentials; `admin` for local Compose. |
+
+Separate username/password properties accept special characters without URI
+encoding. For hosted MongoDB, set `SPRING_MONGODB_URI` in the actual process
+environment. In the imported `.env` file use the lowercase property
+`spring.mongodb.uri=...` instead; the example shows this optional setting.
+URI credentials must be percent-encoded. `MONGO_DB` still determines the
+application database, even when a URI includes a database name. Supply the
+provider's TLS and replica-set options in its URI. Do not put real URIs in Git.
+
+From `backend/`, after filling the required local passwords:
+
+```bash
+docker compose up -d postgres mongo
+docker compose ps postgres mongo
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+On PowerShell use `.\mvnw.cmd`. A successful `/actuator/health` response is
+HTTP 200 with `status: UP` and no component details. Invalid MongoDB credentials
+or an unavailable MongoDB server make the health check return HTTP 503/DOWN;
+MongoDB's lazy client does not guarantee startup will fail immediately.
+The Compose MongoDB health check authenticates before running `ping`.
+
+`mvn verify` starts temporary PostgreSQL and MongoDB 7 containers. The MongoDB
+test executes `{ping: 1}` through the application's configured `MongoTemplate`
+and checks `ok: 1`. Existing SQL migration and HTTP tests still run. No business
+collections, document models or MongoDB repositories are added by this task.
+Use separate limited users for hosted environments; the Compose root user is
+for the local development setup.
+
+Reference: [Spring Boot MongoDB configuration](https://docs.spring.io/spring-boot/reference/data/nosql.html).
 
 ## Branches and workflow
 

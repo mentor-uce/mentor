@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@Import(PostgreSqlTestConfiguration.class)
+@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class})
 class MentorApplicationTests {
 
     @Autowired
