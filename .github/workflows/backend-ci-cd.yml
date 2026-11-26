@@ -20,14 +20,12 @@ concurrency:
 permissions:
   contents: read
 
-# Monorepo: the backend lives in backend
-defaults:
-  run:
-    working-directory: backend
-
 jobs:
   # ---------------- CI ----------------
   backend:
+    defaults:
+      run:
+        working-directory: backend
     name: Backend (Spring Boot)
     runs-on: ubuntu-latest
     steps:
@@ -56,6 +54,9 @@ jobs:
         run: docker build -t mentor-backend:ci .
 
   docker-compose:
+    defaults:
+      run:
+        working-directory: backend
     name: Docker Compose config
     runs-on: ubuntu-latest
     steps:

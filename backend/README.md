@@ -11,7 +11,7 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Web app and landing page: `frontend/web` and `frontend/landing` of this monorepo
 - **Documentation (architecture, diagrams, workflow): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)**
 
-## Current implementation (MEN-11)
+## Current implementation
 
 - Java 21 and Spring Boot 4.2.0
 - Spring MVC with an embedded HTTP server
@@ -34,7 +34,7 @@ no business routes exist yet.
 - JUnit Jupiter and Mockito for tests (versions managed by Spring Boot)
 - Maven as the build tool
 
-## Package structure (MEN-12)
+## Existing package structure
 
 The application root package is `com.mentor`. The following module packages
 each contain `presentation`, `application`, `domain` and `infrastructure`:
@@ -110,8 +110,41 @@ Docker Compose file in this folder (`docker-compose.yml`):
 `--profile automation` to start n8n. Never commit `.env` files or real credentials.
 
 The existing `Dockerfile` builds the application with Maven and runs the JAR on
-port 8080. The `/actuator/health` endpoint is not provided by MEN-11; health checks
-are part of MEN-13.
+port 8080. The base application does not yet provide `/actuator/health`; health checks
+are part of the current MEN-15 task.
+
+## Repository setup (MEN-12)
+
+The current monorepo separates `backend/` from `frontend/web/` and
+`frontend/landing/`. Maven Wrapper, `pom.xml`, Java sources, the Dockerfile,
+Compose and `.env.example` are inside `backend/`, not the repository root.
+
+The Jira task names `feature/backend-core` as the base work branch. From the
+monorepo root, update it without rewriting history:
+
+```bash
+git fetch origin
+git switch feature/backend-core
+git merge --ff-only origin/develop
+```
+
+For a fresh clone, first create the local tracking branch with
+`git switch --track origin/feature/backend-core`. If fast-forward fails, inspect
+the divergent changes; do not reset or force-push the branch.
+
+Create `backend/.env` from `backend/.env.example` only if it does not already
+exist. Set the four required local passwords (`POSTGRES_PASSWORD`,
+`MONGO_PASSWORD`, `REDIS_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`) outside Git.
+From `backend/`, validate all Compose profiles without starting containers:
+
+```bash
+docker compose --profile app --profile automation config --quiet
+```
+
+The template contains 43 distinct variables and covers every Compose
+interpolation. `.env` and `.env.local` are ignored. Validation of this setup
+does not establish connectivity to databases, Keycloak or payment/video
+providers; those integrations remain in their implementation tasks.
 
 ## Branches and workflow
 
