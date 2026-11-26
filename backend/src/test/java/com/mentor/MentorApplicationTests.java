@@ -1,12 +1,33 @@
 package com.mentor;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@Import(PostgreSqlTestConfiguration.class)
 class MentorApplicationTests {
 
+    @Autowired
+    private ApplicationContext context;
+
     @Test
-    void contextLoads() {
+    void applicationConnectsToPostgreSqlOnStartup() throws Exception {
+        var dataSource = context.getBean(DataSource.class);
+        try (var connection = dataSource.getConnection();
+                var statement = connection.createStatement();
+                var result = statement.executeQuery("SELECT 1")) {
+            assertEquals("PostgreSQL", connection.getMetaData().getDatabaseProductName());
+            assertTrue(result.next());
+            assertEquals(1, result.getInt(1));
+        }
+        assertTrue(context.containsBean("entityManagerFactory"), "JPA must initialize at startup");
     }
 }
