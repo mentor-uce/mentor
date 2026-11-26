@@ -1,0 +1,87 @@
+name: Frontend deploy (reusable)
+
+# Called by Frontend CI/CD. Downloads the builds validated by the CI of the same commit and
+# publishes them to S3, then invalidates CloudFront. The "production" environment waits for the
+# manual approval configured in GitHub (Settings > Environments > production).
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "GitHub environment to deploy to (qa or production)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Publish to S3 and CloudFront
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      S3_BUCKET_WEB: ${{ vars.S3_BUCKET_WEB }}
+      CLOUDFRONT_DISTRIBUTION_WEB: ${{ vars.CLOUDFRONT_DISTRIBUTION_WEB }}
+      S3_BUCKET_LANDING: ${{ vars.S3_BUCKET_LANDING }}
+      CLOUDFRONT_DISTRIBUTION_LANDING: ${{ vars.CLOUDFRONT_DISTRIBUTION_LANDING }}
+    steps:
+      - name: Check the AWS configuration
+        id: cfg
+        run: |
+          if [ -z "$AWS_ROLE_ARN" ] || [ -z "$AWS_REGION" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "AWS_ROLE_ARN / AWS_REGION are not configured in the ${{ inputs.environment }} environment yet. Skipping the deploy."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download the web build
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: web-dist-${{ github.sha }}
+          path: dist-web
+
+      - name: Download the landing build
+        if: steps.cfg.outputs.configured == 'true'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: landing-dist-${{ github.sha }}
+          path: dist-landing
+
+      - name: Configure AWS credentials (OIDC)
+        if: steps.cfg.outputs.configured == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publish the web app
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          if [ -d dist-web ] && [ -n "$S3_BUCKET_WEB" ]; then
+            aws s3 sync dist-web "s3://$S3_BUCKET_WEB" --delete
+            if [ -n "$CLOUDFRONT_DISTRIBUTION_WEB" ]; then
+              aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_WEB" --paths "/*"
+            fi
+          else
+            echo "No web build or S3_BUCKET_WEB is not set. Skipping the web app."
+          fi
+
+      - name: Publish the landing page
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          if [ -d dist-landing ] && [ -n "$S3_BUCKET_LANDING" ]; then
+            aws s3 sync dist-landing "s3://$S3_BUCKET_LANDING" --delete
+            if [ -n "$CLOUDFRONT_DISTRIBUTION_LANDING" ]; then
+              aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_LANDING" --paths "/*"
+            fi
+          else
+            echo "No landing build or S3_BUCKET_LANDING is not set. Skipping the landing page."
+          fi
