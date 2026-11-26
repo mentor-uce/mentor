@@ -110,6 +110,9 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8081/realms/mentor}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-mentor}/protocol/openid-connect/certs
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      SOCKET_IO_ENABLED: ${SOCKET_IO_ENABLED:-true}
+      SOCKET_IO_HOST: 0.0.0.0
+      SOCKET_IO_PORT: 9092
       VIDEO_PROVIDER: ${VIDEO_PROVIDER:-webrtc}
       PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-kushki}
     env_file:
@@ -117,6 +120,7 @@ services:
         required: false
     ports:
       - "8080:8080"
+      - "127.0.0.1:9092:9092"
     depends_on:
       postgres:
         condition: service_healthy
@@ -139,7 +143,7 @@ services:
       context: ../frontend/web
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
-        VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080/ws}
+        VITE_WS_URL: ${VITE_WS_URL:-http://localhost:9092}
         VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8081}
         VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-mentor}
         VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-mentor-web}

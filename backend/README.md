@@ -439,3 +439,24 @@ GitHub Actions (`.github/workflows/backend-ci-cd.yml` at the root of the monorep
 - Never commit passwords, tokens or `.env` files.
 - QA and production secrets are stored in GitHub (Settings → Environments) or in the hosting provider.
 - Payments are tested only in sandbox mode.
+
+## Socket.IO connectivity (MEN-23)
+
+Enable `SOCKET_IO_ENABLED=true` (included in `.env.example` and Compose). Direct JVM runs bind `127.0.0.1:9092`; Compose binds internally on all interfaces and publishes port9092 on host loopback only. Override `SOCKET_IO_HOST`/`SOCKET_IO_PORT` for direct runs. HTTP REST remains on port8080.
+
+Use a Socket.IO v4-compatible client, namespace `/mentor`, Engine.IO path `/socket.io`, and WebSocket transport. Tokens go in the namespace auth payload, never query parameters:
+
+```ts
+import { io } from "socket.io-client";
+const socket = io("http://localhost:9092/mentor", {
+  path: "/socket.io",
+  transports: ["websocket"],
+  auth: { token: accessToken },
+});
+socket.on("connect", () => socket.emit("ping", "hello"));
+socket.on("pong", console.log); // "pong"
+```
+
+The server reuses the REST JWT validator (RS256, issuer, audience, required claims). It rejects untrusted browser origins, missing/invalid tokens and URL tokens; only explicit configured CORS origins are accepted. A connected token is checked on each ping and disconnected at expiry (idle connections within one second). Refresh through Keycloak and reconnect with the new auth token. TLS belongs at the trusted gateway in hosted environments; do not expose this plain local transport publicly.
+
+This task provides an authenticated ping/pong scaffold, not chat, business-room access, account-state reconciliation, persistence or Redis distribution between replicas. Those require their own business use cases and integration evidence. The Java Socket.IO2.1.2 protocol client is exercised against netty-socketio2.0.14 in HTTP integration tests; a raw WebSocket echo is not used as a substitute.
