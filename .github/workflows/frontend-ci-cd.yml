@@ -3,14 +3,24 @@ name: Frontend CI/CD
 # CI: runs on every Pull Request to develop or main (lint, tests and build).
 # CD: runs when a Pull Request is merged (push) into develop (QA) or main (production).
 #     Production waits for the manual approval configured in the "production" environment.
+#
+# Target (see the system document, section 16): the web app and the landing page are static
+# builds. They are uploaded to S3 and CloudFront is invalidated. AWS access uses GitHub OIDC
+# (a role, no stored access keys). Every AWS step is skipped with a notice until the variables
+# below exist in the "qa" / "production" environment, so the pipeline never breaks without them.
+#
+#   Variables (Settings > Environments > qa / production > Environment variables):
+#     AWS_REGION, AWS_ROLE_ARN,
+#     S3_BUCKET_WEB, CLOUDFRONT_DISTRIBUTION_WEB,
+#     S3_BUCKET_LANDING, CLOUDFRONT_DISTRIBUTION_LANDING
 
 on:
   pull_request:
     branches: [develop, main]
-    paths: ['frontend/**', '.github/workflows/frontend-ci-cd.yml']
+    paths: ['frontend/**', '.github/workflows/frontend-ci-cd.yml', '.github/workflows/frontend-deploy.yml']
   push:
     branches: [develop, main]
-    paths: ['frontend/**', '.github/workflows/frontend-ci-cd.yml']
+    paths: ['frontend/**', '.github/workflows/frontend-ci-cd.yml', '.github/workflows/frontend-deploy.yml']
   workflow_dispatch:
 
 concurrency:
@@ -53,6 +63,15 @@ jobs:
           npm test --if-present -- --run
           npm run build
 
+      - name: Upload the web build
+        if: steps.exists.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist-${{ github.sha }}
+          path: frontend/web/dist
+          if-no-files-found: ignore
+          retention-days: 7
+
   landing:
     name: Landing (Astro)
     runs-on: ubuntu-latest
@@ -79,6 +98,15 @@ jobs:
           npm ci
           npm run build
 
+      - name: Upload the landing build
+        if: steps.exists.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-dist-${{ github.sha }}
+          path: frontend/landing/dist
+          if-no-files-found: ignore
+          retention-days: 7
+
   ci-ok:
     name: CI passed
     runs-on: ubuntu-latest
@@ -91,32 +119,22 @@ jobs:
     name: Deploy to QA
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: ci-ok
-    runs-on: ubuntu-latest
-    environment: qa
-    steps:
-      - name: Trigger deploy of the web app and landing page
-        env:
-          FRONTEND_DEPLOY_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$FRONTEND_DEPLOY_HOOK" ]; then
-            echo "FRONTEND_DEPLOY_HOOK is not configured in the qa environment yet. Skipping."
-          else
-            curl -fsS -X POST "$FRONTEND_DEPLOY_HOOK"
-          fi
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/frontend-deploy.yml
+    with:
+      environment: qa
+    secrets: inherit
 
   deploy-production:
     name: Deploy to production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: ci-ok
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Trigger deploy of the web app and landing page
-        env:
-          FRONTEND_DEPLOY_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$FRONTEND_DEPLOY_HOOK" ]; then
-            echo "FRONTEND_DEPLOY_HOOK is not configured in the production environment yet. Skipping."
-          else
-            curl -fsS -X POST "$FRONTEND_DEPLOY_HOOK"
-          fi
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/frontend-deploy.yml
+    with:
+      environment: production
+    secrets: inherit
