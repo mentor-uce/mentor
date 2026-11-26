@@ -16,20 +16,20 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Java 21 and Spring Boot 4.2.0
 - Spring MVC with an embedded HTTP server
 - Maven 3.10.1 through the checked-in Maven Wrapper
-- An automated Spring application context startup test
+- Actuator health, GET `/api/v1/hello`, OpenAPI and Swagger UI
+- Configurable API CORS and optional local-profile `.env` import
+- HTTP smoke tests and an application-context startup test
 
 The base application starts without databases, Keycloak or payment credentials.
-Business modules, health checks, Swagger and external integrations belong to
-their respective Jira tasks. Visiting `/` currently returns HTTP 404 because
-no business routes exist yet.
+Business modules and external integrations remain in their respective Jira tasks. The root `/` remains unmapped; use `/api/v1/hello` for an API check.
 
 ## Target tech stack
 
 - Java 21 + Spring Boot
 - Spring Security as an OAuth 2.0 resource server (validates the Keycloak JWT and applies roles)
 - REST /api/v1 documented with OpenAPI (springdoc) and GraphQL (Spring for GraphQL)
-- WebSocket (STOMP) for chat, live status and WebRTC signaling
-- Spring Data JPA (PostgreSQL + pgvector), Spring Data MongoDB and Spring Data Redis
+- Socket.IO for chat and live status (compatibility proof in MEN-23)
+- Spring Data JPA (PostgreSQL/Supabase), Spring Data MongoDB, Spring Data Redis and a Qdrant adapter
 - Spring Boot Actuator (`/actuator/health` is used by the Docker health check)
 - JUnit Jupiter and Mockito for tests (versions managed by Spring Boot)
 - Maven as the build tool
@@ -79,7 +79,7 @@ pinned version on first use.
 ```powershell
 .\mvnw.cmd -v                  # confirm Maven and Java versions
 .\mvnw.cmd clean verify        # compile, run tests and package the application
-.\mvnw.cmd spring-boot:run     # run locally on port 8080
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local'  # loads local .env
 ```
 
 ### Linux / macOS
@@ -87,7 +87,7 @@ pinned version on first use.
 ```bash
 ./mvnw -v
 ./mvnw clean verify
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 ### Run the packaged application
@@ -95,7 +95,7 @@ pinned version on first use.
 After a successful build:
 
 ```bash
-java -jar target/mentor-backend-0.0.1-SNAPSHOT.jar
+java -jar target/mentor-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
 ```
 
 The default port is `8080`. Set `SERVER_PORT` or pass `--server.port=8082` to
@@ -103,15 +103,16 @@ change it. Stop the application with `Ctrl+C`.
 
 The application needs no service credentials or application-specific environment
 variables for this base local run. The `.env.example` file documents future
-integrations; Spring Boot does not automatically load it during a direct run.
+integrations. With the `local` profile, `application-local.properties` imports
+an optional `.env` from the process working directory. Use `KEY=value` syntax
+without shell quoting or `export`. Real process environment variables take precedence.
 When those integrations are implemented, start their infrastructure using the
 Docker Compose file in this folder (`docker-compose.yml`):
 `docker compose up -d` starts PostgreSQL, MongoDB, Redis and Keycloak; add
 `--profile automation` to start n8n. Never commit `.env` files or real credentials.
 
 The existing `Dockerfile` builds the application with Maven and runs the JAR on
-port 8080. The base application does not yet provide `/actuator/health`; health checks
-are part of the current MEN-15 task.
+port 8080. Its Compose health check uses `/actuator/health`.
 
 ## Repository setup (MEN-12)
 
@@ -141,10 +142,42 @@ From `backend/`, validate all Compose profiles without starting containers:
 docker compose --profile app --profile automation config --quiet
 ```
 
-The template contains 43 distinct variables and covers every Compose
-interpolation. `.env` and `.env.local` are ignored. Validation of this setup
+The template documents the variables used by Compose and direct local runs. `.env` and `.env.local` are ignored. Validation of this setup
 does not establish connectivity to databases, Keycloak or payment/video
 providers; those integrations remain in their implementation tasks.
+
+## API checks and documentation (MEN-15)
+
+Run from `backend/`. Copy `.env.example` to `.env` if needed and activate the
+`local` profile as shown above. `SERVER_PORT` defaults to 8080;
+`CORS_ALLOWED_ORIGINS` is a comma-separated list of exact frontend origins,
+for example `http://localhost:5173,http://127.0.0.1:5173`.
+
+| URL | Expected result |
+| --- | --- |
+| `http://localhost:8080/api/v1/hello` | HTTP 200 and `{"message":"Mentor backend is running"}`. |
+| `http://localhost:8080/actuator/health` | HTTP 200 and `status: UP`; no component details or secrets. Health group names may also be present. |
+| `http://localhost:8080/v3/api-docs` | OpenAPI JSON with Mentor API metadata and `/api/v1/hello`. |
+| `http://localhost:8080/swagger-ui/index.html` | Swagger UI served by this application. `/swagger-ui.html` redirects to it. |
+
+Only the health actuator is exposed. API CORS accepts configured origins and
+rejects unlisted origins; wildcard origins are not accepted. Bearer-token
+headers are allowed without enabling cross-origin cookie credentials.
+Socket.IO will have its own origin policy when implemented.
+
+Health and documentation are public for this bootstrap task. The Keycloak
+security task must apply the agreed environment/role policy for documentation
+and business routes; it must not expose additional management endpoints.
+No database or provider connectivity is implied by the base health response.
+
+```powershell
+Invoke-RestMethod http://localhost:8080/actuator/health
+Invoke-RestMethod http://localhost:8080/api/v1/hello
+```
+
+Run `./mvnw verify` (or `.\mvnw.cmd verify` on Windows) for context and HTTP
+smoke tests: health, restricted management exposure, hello contract, OpenAPI,
+Swagger UI, allowed/blocked origins and CORS preflight.
 
 ## Branches and workflow
 
