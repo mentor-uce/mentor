@@ -391,6 +391,29 @@ signature, issuer, audience, expiry, not-before, missing subject/expiry and role
 denial. Existing public endpoint and CORS tests stay active.
 Reference: [Spring Security JWT validation](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html).
 
+## Authenticated identity (MEN-22)
+
+`GET /api/v1/auth/me` requires a valid Keycloak API access token. Without it,
+the response is 401. It returns exactly:
+
+```json
+{"id":"<Keycloak sub>","username":"tutor.local","email":"tutor@example.invalid","roles":["STUDENT","TUTOR"]}
+```
+
+`id` is the Keycloak subject, not an application database identifier. Username
+and email reflect the corresponding token claims and can be null if omitted.
+Roles are the verified, known realm roles already mapped by authentication,
+sorted and deduplicated. No client-role grants, raw JWT, private claims, refresh
+token or password are returned. Security response headers disable caching.
+This endpoint does not create/update a user record or decide tutor eligibility.
+
+Swagger describes the bearerAuth requirement for this route; public hello does
+not require it. In frontend, obtain the access token using mentor-web PKCE, send
+the Authorization header and handle 401 by refreshing/re-authenticating through
+Keycloak. Do not send an ID token or calculate roles from unverified browser data
+as authorization. The Keycloak verifier's `--expect-me` option checks all three
+seeded identities against the actual packaged API, and CI runs the same check.
+
 ## Branches and workflow
 
 | Branch | Purpose |

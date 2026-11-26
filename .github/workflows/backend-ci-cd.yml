@@ -53,7 +53,7 @@ jobs:
 
       - name: Verify local Keycloak realm and PKCE
         if: steps.exists.outputs.found == 'true'
-        run: python3 scripts/verify_keycloak.py --backend-jar target/mentor-backend-0.0.1-SNAPSHOT.jar
+        run: python3 scripts/verify_keycloak.py --backend-jar target/mentor-backend-0.0.1-SNAPSHOT.jar --expect-me
 
       - name: Build the Docker image
         if: steps.exists.outputs.found == 'true'
