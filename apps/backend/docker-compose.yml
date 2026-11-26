@@ -7,8 +7,7 @@
 # Values come from the .env file (copy .env.example to .env). Never commit .env.
 #
 # The "app" profile builds this backend and the web app and landing page from
-# mentor-frontend, so clone it next to this repository:
-#   ../mentor-frontend   https://github.com/mentor-uce/mentor-frontend (includes landing/)
+# their folders in the monorepo (../web-shell and ../landing).
 
 name: mentor
 
@@ -127,7 +126,7 @@ services:
   frontend:
     profiles: ["app"]
     build:
-      context: ../mentor-frontend
+      context: ../web-shell
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
         VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080/ws}
@@ -143,7 +142,7 @@ services:
   landing:
     profiles: ["app"]
     build:
-      context: ../mentor-frontend/landing
+      context: ../landing
       args:
         PUBLIC_APP_URL: ${PUBLIC_APP_URL:-http://localhost:5173}
     restart: unless-stopped

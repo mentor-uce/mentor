@@ -4,11 +4,7 @@ Mentor API: Spring Boot (Java 21) modular monolith with DDD.
 
 Part of **Mentor – Learn and teach among peers**, a peer-tutoring web platform for students of Universidad Central del Ecuador.
 
-| Repository | Content |
-|---|---|
-| [mentor-backend](https://github.com/mentor-uce/mentor-backend) | Spring Boot API (this repository) |
-| [mentor-frontend](https://github.com/mentor-uce/mentor-frontend) | React web app and Astro landing page |
-| [mentor](https://github.com/mentor-uce/mentor) | Docker Compose, architecture diagrams and shared documentation |
+This folder is part of the `mentor` monorepo: the web app and landing page are in `apps/web-shell` and `apps/landing`; Docker Compose is in this folder; the shared documentation is in `docs/`.
 
 **Owner:** Alquinga Cristopher (@Cristopher2912)
 
