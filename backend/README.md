@@ -19,6 +19,7 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Actuator health, GET `/api/v1/hello`, OpenAPI and Swagger UI
 - Configurable API CORS and optional local-profile `.env` import
 - Spring Data JPA and PostgreSQL connection configured through environment variables
+- Flyway startup migrations with SQL checksum validation
 - HTTP smoke and startup connectivity tests against temporary PostgreSQL containers
 
 The application now requires a reachable PostgreSQL database and its credentials. Keycloak and payment integrations remain planned.
@@ -211,8 +212,7 @@ For hosted databases, set the provider JDBC URL and TLS options plus credentials
 through the environment. This task does not provision a Supabase instance.
 
 Hibernate automatic schema creation/update is disabled (`ddl-auto=none`),
-and Open Session in View is disabled. No entities, business tables or migrations
-are added. Flyway and `V1__init.sql` belong to MEN-17. With incorrect credentials
+and Open Session in View is disabled. No entities or business tables are added. With incorrect credentials
 or an unreachable database, startup fails; do not treat a disconnected API as healthy.
 
 `mvn verify` requires Docker: Testcontainers starts PostgreSQL 16 with ephemeral
@@ -222,6 +222,41 @@ use your local `.env`, database or credentials; containers are stopped afterward
 CI runners already provide Docker. Reference:
 [Spring Boot SQL configuration](https://docs.spring.io/spring-boot/reference/data/sql.html)
 and [Testcontainers service connections](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html).
+
+## Flyway migrations (MEN-17)
+
+Flyway runs automatically on the application DataSource before JPA initialization.
+Spring Boot manages Flyway's version; the PostgreSQL database module is included.
+No additional credentials or manual SQL execution are needed for migrations.
+
+Production migration files live in `src/main/resources/db/migration/` and follow
+`V<version>__<description>.sql`. The first file, `V1__init.sql`, intentionally
+executes only `SELECT 1`: it verifies the migration pipeline without inventing
+business tables. Flyway creates `flyway_schema_history`, records version 1 as
+successful and stores its checksum. Future schema changes get new versions
+(`V2__...sql`, etc.); never edit a migration already applied to a shared database.
+
+After starting the API, check the Flyway startup log and, if needed, run this
+read-only query against the configured application database:
+
+```sql
+SELECT version, script, success, checksum
+FROM flyway_schema_history
+ORDER BY installed_rank;
+```
+
+Expect one successful `V1__init.sql` record. Restarting against the same database
+validates it without applying V1 again. A checksum mismatch stops startup.
+Automatic baselining is disabled: an existing schema with application objects
+and no Flyway history requires a reviewed adoption plan; do not enable baseline
+or delete data just to make startup pass. Flyway clean is disabled, and Hibernate
+keeps `ddl-auto=none`. The existing Compose initialization creates the pgvector
+extension and separate Keycloak/n8n databases; Flyway uses only the application's
+configured database, not those other databases.
+
+`mvn verify` includes a real PostgreSQL startup assertion that V1 was successfully
+recorded, alongside the connection and HTTP tests. Docker is required.
+Reference: [Spring Boot migration initialization](https://docs.spring.io/spring-boot/how-to/data-initialization.html).
 
 ## Branches and workflow
 
