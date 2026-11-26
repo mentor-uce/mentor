@@ -1,0 +1,60 @@
+---
+import StepCard from '../molecules/StepCard.astro';
+
+const studentSteps = [
+  {
+    stepNumber: 1,
+    title: 'Search for Tutoring Services',
+    description:
+      'Explore available subjects, faculties, and topics taught by peer students who excelled in those courses.',
+  },
+  {
+    stepNumber: 2,
+    title: 'Request a Tutoring Session',
+    description:
+      'Choose an available time slot matching your schedule and submit a structured session request.',
+  },
+  {
+    stepNumber: 3,
+    title: 'Receive the Tutoring Session',
+    description:
+      'Connect with your peer tutor for personalized academic support tailored to UCE curriculum standards.',
+  },
+  {
+    stepNumber: 4,
+    title: 'Review the Tutor',
+    description:
+      'Submit feedback and rate the completed session to foster peer accountability and assist fellow classmates.',
+  },
+];
+---
+
+<div class="flex flex-col h-full bg-slate-50/70 p-6 md:p-8 rounded-2xl border border-slate-200">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-sky/20 text-mentor-night border border-mentor-sky/30 uppercase tracking-wide"
+    >
+      Student Journey
+    </span>
+    <h3 class="text-xl font-heading font-bold text-mentor-night">
+      How to Learn with a Peer
+    </h3>
+  </div>
+
+  <p class="text-sm text-slate-600 mb-6">
+    Get fast, accessible academic support in your difficult courses from students who have already passed them.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+    {
+      studentSteps.map((step) => (
+        <StepCard
+          stepNumber={step.stepNumber}
+          title={step.title}
+          description={step.description}
+          roleVariant="student"
+        />
+      ))
+    }
+  </div>
+</div>

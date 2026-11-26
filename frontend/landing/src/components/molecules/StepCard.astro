@@ -1,0 +1,41 @@
+---
+interface Props {
+  stepNumber: number;
+  title: string;
+  description: string;
+  roleVariant?: 'student' | 'tutor';
+  class?: string;
+}
+
+const {
+  stepNumber,
+  title,
+  description,
+  roleVariant = 'student',
+  class: className = '',
+} = Astro.props;
+
+const badgeColors =
+  roleVariant === 'student'
+    ? 'bg-mentor-sky/15 text-mentor-night border border-mentor-sky/30'
+    : 'bg-mentor-turquoise/20 text-mentor-deep-turquoise border border-mentor-turquoise/40';
+---
+
+<div
+  class={`flex flex-col p-6 bg-white rounded-xl border border-slate-200 shadow-sm relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${className}`}
+>
+  <div class="flex items-center gap-3 mb-3">
+    <span
+      class={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold font-heading ${badgeColors}`}
+      aria-label={`Step ${stepNumber}`}
+    >
+      0{stepNumber}
+    </span>
+    <h4 class="text-base font-semibold font-heading text-mentor-night">
+      {title}
+    </h4>
+  </div>
+  <p class="text-sm text-slate-600 leading-relaxed">
+    {description}
+  </p>
+</div>

@@ -1,0 +1,78 @@
+---
+import Container from '../atoms/Container.astro';
+import FAQItem from '../molecules/FAQItem.astro';
+
+const faqs = [
+  {
+    question: '1. What is Mentor?',
+    answer:
+      'Mentor is an academic peer-tutoring web platform developed for students at Universidad Central del Ecuador (UCE). It connects students seeking to improve their understanding of complex subjects with classmates who have successfully completed those courses and want to teach.',
+    open: true,
+  },
+  {
+    question: '2. Who can use Mentor?',
+    answer:
+      'Mentor is designed for active undergraduate students enrolled at Universidad Central del Ecuador who hold an official @uce.edu.ec university email address.',
+  },
+  {
+    question: '3. How can I become a tutor?',
+    answer:
+      'Once you register and verify your university email, you can activate Tutor Mode directly from your profile dashboard. You do not lose your student privileges—a single account allows you to schedule sessions as a student or offer tutoring services as a tutor.',
+  },
+  {
+    question: '4. Are tutoring services free or paid?',
+    answer:
+      'Tutors may publish free peer sessions or define nominal rates for academic support. However, all platform payment flows currently operate using Stripe strictly in test mode. No real money or actual monetary charges are processed.',
+  },
+  {
+    question: '5. How do tutoring requests work?',
+    answer:
+      'Students browse available courses and tutor schedules, choose a convenient date and time, and send a structured booking request. The tutor receives the notification and can confirm or decline the session based on availability.',
+  },
+  {
+    question: '6. How are tutoring sessions completed?',
+    answer:
+      'At the conclusion of the session, the student provides the tutor with a unique 6-digit session completion code. Once the tutor inputs this code into the platform, the session is officially marked as completed, unlocking student reviews.',
+  },
+  {
+    question: '7. How does email verification work?',
+    answer:
+      'During registration, a verification link or code is dispatched to your active @uce.edu.ec student email address. Verifying your inbox confirms your affiliation with Universidad Central del Ecuador before you can request or host sessions.',
+  },
+  {
+    question: '8. Does Mentor process real payments?',
+    answer:
+      'No. Mentor does not process real payments or real credit card transactions. The payment system is integrated with Stripe in test sandbox mode solely for academic demonstration and software architecture evaluation.',
+  },
+];
+---
+
+<section id="faq" class="py-16 md:py-24 bg-slate-50/50 border-t border-slate-100">
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
+      >
+        Got Questions?
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
+        Frequently Asked Questions
+      </h2>
+      <p class="text-base text-slate-600 leading-relaxed">
+        Find quick answers regarding our peer tutoring guidelines, safety procedures, and platform usage.
+      </p>
+    </div>
+
+    <div class="max-w-3xl mx-auto space-y-4">
+      {
+        faqs.map((faq) => (
+          <FAQItem
+            question={faq.question}
+            answer={faq.answer}
+            open={faq.open}
+          />
+        ))
+      }
+    </div>
+  </Container>
+</section>

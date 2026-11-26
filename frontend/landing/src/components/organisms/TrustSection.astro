@@ -1,0 +1,82 @@
+---
+import Container from '../atoms/Container.astro';
+import Icon from '../atoms/Icon.astro';
+
+const trustPillars = [
+  {
+    title: 'UCE Institutional Email Verification',
+    description:
+      'Account creation requires an active @uce.edu.ec university address to ensure that our tutoring community consists exclusively of legitimate university peers.',
+    icon: 'shield-check' as const,
+  },
+  {
+    title: 'Verified Student Tutors',
+    description:
+      'Only registered students with verified email accounts can activate tutor mode and publish course offerings, keeping the ecosystem authentic.',
+    icon: 'academic-cap' as const,
+  },
+  {
+    title: 'Session Completion Codes',
+    description:
+      'Each session concludes only when the student shares a secure completion code with the tutor, guaranteeing mutual agreement that the session took place.',
+    icon: 'lock' as const,
+  },
+  {
+    title: 'Genuine Post-Session Reviews',
+    description:
+      'Ratings can only be submitted after a verified session is finalized. No anonymous ratings or unverified feedback are permitted.',
+    icon: 'star' as const,
+  },
+];
+---
+
+<section id="trust" class="py-16 md:py-24 bg-mentor-night text-white relative overflow-hidden">
+  <!-- Accent light effect -->
+  <div
+    class="absolute -bottom-24 -right-24 w-96 h-96 bg-mentor-indigo/20 rounded-full blur-3xl pointer-events-none"
+    aria-hidden="true"
+  ></div>
+
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-turquoise bg-mentor-deep-turquoise/30 rounded-full border border-mentor-turquoise/30"
+      >
+        Safety & Academic Integrity
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-white mb-4">
+        Built on Community Trust
+      </h2>
+      <p class="text-base text-slate-300 leading-relaxed">
+        Mentor establishes clear peer-to-peer security principles to ensure accountable and respectful academic cooperation.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {
+        trustPillars.map((pillar) => (
+          <div class="flex items-start gap-4 p-6 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-mentor-deep-turquoise/20 text-mentor-turquoise flex items-center justify-center shrink-0">
+              <Icon name={pillar.icon} class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="font-heading font-semibold text-white text-base mb-2">
+                {pillar.title}
+              </h3>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                {pillar.description}
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Transparent Notice on Payment & Academic Scope -->
+    <div class="mt-12 max-w-3xl mx-auto p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-center">
+      <p class="text-xs text-slate-300 leading-relaxed">
+        <strong class="text-mentor-sky">Demonstration Environment Notice:</strong> Payments on this platform use Stripe strictly in test mode for academic evaluation. No real financial transactions or monetary charges occur.
+      </p>
+    </div>
+  </Container>
+</section>
