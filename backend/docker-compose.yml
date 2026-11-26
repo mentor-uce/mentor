@@ -66,7 +66,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     restart: unless-stopped
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm"]
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
@@ -74,10 +74,15 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
+      MENTOR_TEST_STUDENT_PASSWORD: ${MENTOR_TEST_STUDENT_PASSWORD:?Set MENTOR_TEST_STUDENT_PASSWORD in .env}
+      MENTOR_TEST_TUTOR_PASSWORD: ${MENTOR_TEST_TUTOR_PASSWORD:?Set MENTOR_TEST_TUTOR_PASSWORD in .env}
+      MENTOR_TEST_ADMIN_PASSWORD: ${MENTOR_TEST_ADMIN_PASSWORD:?Set MENTOR_TEST_ADMIN_PASSWORD in .env}
       KC_HTTP_PORT: 8080
       KC_HOSTNAME_STRICT: "false"
     ports:
       - "8081:8080"
+    volumes:
+      - ./docker/keycloak/mentor-realm.json:/opt/keycloak/data/import/mentor-realm.json:ro
     depends_on:
       postgres:
         condition: service_healthy

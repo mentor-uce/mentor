@@ -326,6 +326,41 @@ append-only persistence; Redis is a disposable cache, not business storage. Its 
 
 Reference: [Spring Boot Redis](https://docs.spring.io/spring-boot/reference/data/nosql.html).
 
+## Local Keycloak realm (MEN-20)
+
+The local-only realm definition is `docker/keycloak/mentor-realm.json`, mounted
+read-only by Compose and imported at startup. Set distinct generated passwords
+in `.env`: `MENTOR_TEST_STUDENT_PASSWORD`, `MENTOR_TEST_TUTOR_PASSWORD` and
+`MENTOR_TEST_ADMIN_PASSWORD`, as well as the separate Keycloak bootstrap-admin
+password. No test-user password is stored in the realm file. Keycloak resolves
+the environment placeholders on import.
+
+The `mentor` realm has `STUDENT`, `TUTOR` and `ADMIN` roles. `TUTOR` includes
+`STUDENT`. Seed accounts `student.local`, `tutor.local` and `admin.local` use
+synthetic example.invalid addresses. `admin.local` is a Mentor application role,
+not a Keycloak server administrator. Never import these development users into
+QA/production; use an environment-specific realm provisioning process instead.
+
+`mentor-web` is a public OpenID Connect client: Authorization Code and required
+PKCE S256, no client secret, password grant, implicit flow or service account.
+Local redirect URLs and origins are limited to localhost/127.0.0.1 port 5173.
+An audience mapper adds `mentor-api` to access tokens, not ID tokens. Hosted
+environments require their own exact HTTPS redirect/origin configuration.
+
+Run `docker compose up -d postgres keycloak` with the required `.env` values.
+The console is `http://localhost:8081`. Import skips a realm that already exists;
+it does not update it or reset users. Review existing realm changes through the
+admin process, without deleting data or overwriting the realm automatically.
+
+With Docker and Python 3 available, run `python scripts/verify_keycloak.py` from
+`backend/`. This creates a disposable Keycloak container with random passwords,
+verifies three real Authorization Code/S256 logins, realm roles and API audience,
+and rejects password-grant and missing-PKCE requests. Secrets and tokens stay in
+memory or temporary files that are removed. CI runs this check too.
+
+Reference: [Keycloak realm import](https://www.keycloak.org/server/importExport)
+and [Keycloak client security](https://www.keycloak.org/docs/26.0.8/server_admin/index.html).
+
 ## Branches and workflow
 
 | Branch | Purpose |
