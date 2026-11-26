@@ -107,7 +107,7 @@ def claims(token):
     return json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
 
 
-def verify(repository, backend_jar=None):
+def verify(repository, backend_jar=None, expect_me=False):
     realm = Path(repository) / "backend/docker/keycloak/mentor-realm.json"
     assert realm.is_file(), "Missing mentor-realm.json"
     configuration = json.loads(realm.read_text(encoding="utf-8"))
@@ -180,7 +180,7 @@ def verify(repository, backend_jar=None):
             else:
                 raise AssertionError("Authorization without S256 unexpectedly accepted")
             if backend_jar:
-                verify_backend(backend_jar, base, issued_tokens)
+                verify_backend(backend_jar, base, issued_tokens, expect_me)
             return {"realm": "mentor", "client": "mentor-web", "pkceS256": "passed", "testUserLogins": 3,
                     "rolesAndAudience": "passed", "passwordGrant": "rejected", "missingPkce": "rejected"}
     finally:
@@ -188,13 +188,110 @@ def verify(repository, backend_jar=None):
             subprocess.run(["docker", "rm", "-f", owned_container_id], capture_output=True)
 
 
-def verify_backend(backend_jar, issuer, tokens):
-    raise AssertionError("Backend token verification is introduced in MEN-21")
+def verify_backend(backend_jar, issuer, tokens, expect_me=False):
+    """Verify production JWT filters against actual Keycloak-issued access tokens."""
+    import socket
+    suffix = secrets.token_hex(4)
+    names = {service: "mentor-auth-check-" + service + "-" + suffix for service in ("pg", "mongo", "redis")}
+    process = None
+    password = secrets.token_hex(24)
+    manager = tempfile.TemporaryDirectory(prefix="mentor-auth-")
+    try:
+        directory = Path(manager.name)
+        env_file = directory / "services.env"
+        env_file.write_text("\n".join(("POSTGRES_USER=mentor_check", "POSTGRES_DB=mentor_check",
+            "POSTGRES_PASSWORD=" + password, "MONGO_INITDB_ROOT_USERNAME=mentor_check",
+            "MONGO_INITDB_ROOT_PASSWORD=" + password, "REDIS_PASSWORD=" + password)), encoding="utf-8")
+        for service, image, port, command in (
+            ("pg", "postgres:16-alpine", 5432, []),
+            ("mongo", "mongo:7", 27017, []),
+            ("redis", "redis:7-alpine", 6379, ["sh", "-c", 'exec redis-server --requirepass "$REDIS_PASSWORD" --save "" --appendonly no'])):
+            docker("run", "-d", "--rm", "--name", names[service], "--env-file", str(env_file),
+                   "-p", "127.0.0.1::" + str(port), image, *command)
+        ports = {service: docker("port", names[service], str(port) + "/tcp").split(":")[-1]
+                 for service, port in (("pg", 5432), ("mongo", 27017), ("redis", 6379))}
+        ready = False
+        for _ in range(80):
+            pg = subprocess.run(["docker", "exec", names["pg"], "pg_isready", "-U", "mentor_check", "-d", "mentor_check"], capture_output=True)
+            mongo = subprocess.run(["docker", "exec", names["mongo"], "mongosh", "--quiet", "--eval",
+                "const a=db.getSiblingDB('admin');a.auth(process.env.MONGO_INITDB_ROOT_USERNAME,process.env.MONGO_INITDB_ROOT_PASSWORD);if(a.runCommand({ping:1}).ok!==1)quit(1)"], capture_output=True)
+            if pg.returncode == 0 and mongo.returncode == 0:
+                ready = True
+                break
+            time.sleep(.5)
+        assert ready, "Temporary auth-test databases did not start"
+        with socket.socket() as listener:
+            listener.bind(("127.0.0.1", 0))
+            api_port = listener.getsockname()[1]
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith(("SPRING_", "MONGO_", "POSTGRES_", "REDIS_", "KEYCLOAK_"))}
+        environment.update({"SERVER_PORT": str(api_port), "SERVER_ADDRESS": "127.0.0.1",
+            "POSTGRES_HOST": "127.0.0.1", "POSTGRES_PORT": ports["pg"], "POSTGRES_DB": "mentor_check",
+            "POSTGRES_USER": "mentor_check", "POSTGRES_PASSWORD": password,
+            "MONGO_HOST": "127.0.0.1", "MONGO_PORT": ports["mongo"], "MONGO_DB": "mentor_check",
+            "MONGO_USER": "mentor_check", "MONGO_PASSWORD": password,
+            "REDIS_HOST": "127.0.0.1", "REDIS_PORT": ports["redis"], "REDIS_PASSWORD": password,
+            "KEYCLOAK_ISSUER_URI": issuer, "KEYCLOAK_JWK_SET_URI": issuer + "/protocol/openid-connect/certs",
+            "KEYCLOAK_API_AUDIENCE": "mentor-api"})
+        java = str(Path(environment["JAVA_HOME"]) / "bin" / ("java.exe" if os.name == "nt" else "java")) if environment.get("JAVA_HOME") else "java"
+        with (directory / "backend.log").open("w", encoding="utf-8") as log:
+            process = subprocess.Popen([java, "-jar", str(Path(backend_jar).resolve())], cwd=directory,
+                                       env=environment, stdout=log, stderr=subprocess.STDOUT)
+            root = "http://127.0.0.1:" + str(api_port)
+            for _ in range(100):
+                if process.poll() is not None:
+                    raise AssertionError("Backend exited before real-Keycloak token verification")
+                try:
+                    if request_json(root + "/actuator/health")["status"] == "UP":
+                        break
+                except (OSError, urllib.error.URLError):
+                    time.sleep(.5)
+            else:
+                raise AssertionError("Backend health did not become UP")
+
+            def api(token=None):
+                headers = {"Accept": "application/json"}
+                if token:
+                    headers["Authorization"] = "Bearer " + token
+                request = urllib.request.Request(root + "/api/v1/auth/me", headers=headers)
+                try:
+                    with urllib.request.urlopen(request, timeout=10) as response:
+                        return response.status, json.load(response), response.headers
+                except urllib.error.HTTPError as error:
+                    return error.code, {}, error.headers
+
+            assert api()[0] == 401 and api("invalid-token")[0] == 401
+            for role, token in tokens.items():
+                status, payload, headers = api(token)
+                assert status == (200 if expect_me else 404), f"Real Keycloak token did not authenticate: status={status}, challenge={headers.get('WWW-Authenticate')}"
+                assert "Set-Cookie" not in headers
+                if expect_me:
+                    actual = claims(token)
+                    assert payload["id"] == actual["sub"] and payload["username"] == role.lower() + ".local"
+                    expected = ["STUDENT", "TUTOR"] if role == "TUTOR" else [role]
+                    assert payload["roles"] == expected
+                    assert set(payload) == {"id", "username", "email", "roles"}
+            if expect_me:
+                print("Real Keycloak JWTs verified by /auth/me for STUDENT, TUTOR and ADMIN", flush=True)
+            else:
+                print("Real Keycloak JWTs passed signature/issuer/audience validation; protected route still unmapped", flush=True)
+    finally:
+        if process and process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        for name in names.values():
+            subprocess.run(["docker", "rm", "-f", name], capture_output=True)
+        manager.cleanup()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--repository", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--backend-jar", type=Path)
+    parser.add_argument("--expect-me", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(verify(args.repository, args.backend_jar), indent=2))
+    print(json.dumps(verify(args.repository, args.backend_jar, args.expect_me), indent=2))

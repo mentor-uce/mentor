@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "mentor.cors.allowed-origins=http://localhost:5173,http://127.0.0.1:5173")
-@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class, RedisTestConfiguration.class})
+@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class, RedisTestConfiguration.class, JwtTestConfiguration.class})
 class BackendHttpSmokeTests {
 
     private final HttpClient client = HttpClient.newBuilder()
@@ -45,9 +45,9 @@ class BackendHttpSmokeTests {
     }
 
     @Test
-    void sensitiveActuatorEndpointsAreNotExposed() throws Exception {
-        assertEquals(404, send(request("/actuator/env").GET().build()).statusCode());
-        assertEquals(404, send(request("/actuator/configprops").GET().build()).statusCode());
+    void sensitiveActuatorEndpointsRejectAnonymousRequests() throws Exception {
+        assertEquals(401, send(request("/actuator/env").GET().build()).statusCode());
+        assertEquals(401, send(request("/actuator/configprops").GET().build()).statusCode());
     }
 
     @Test

@@ -23,7 +23,7 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Spring Data MongoDB with an authenticated connection and health integration
 - HTTP smoke and startup connectivity tests against temporary PostgreSQL containers
 
-Healthy operation now requires reachable PostgreSQL, MongoDB and Redis services and their credentials. Keycloak and payment integrations remain planned.
+Healthy operation now requires reachable PostgreSQL, MongoDB and Redis services and their credentials. Keycloak realm and JWT validation are implemented; payment integrations remain planned.
 Business modules and external integrations remain in their respective Jira tasks. The root `/` remains unmapped; use `/api/v1/hello` for an API check.
 
 ## Target tech stack
@@ -360,6 +360,36 @@ memory or temporary files that are removed. CI runs this check too.
 
 Reference: [Keycloak realm import](https://www.keycloak.org/server/importExport)
 and [Keycloak client security](https://www.keycloak.org/docs/26.0.8/server_admin/index.html).
+
+## JWT resource server (MEN-21)
+
+Business routes require `Authorization: Bearer <access_token>`. The API verifies
+the RS256 signature using Keycloak JWKS, exact issuer, audience `mentor-api`,
+expiry/not-before and a nonempty subject. Missing expiry is rejected. ID tokens
+for mentor-web are not API credentials. Wrong, expired or malformed tokens return
+401 with a Bearer challenge; insufficient role permissions return 403.
+
+Configure `KEYCLOAK_ISSUER_URI` and `KEYCLOAK_API_AUDIENCE` in local `.env`.
+`KEYCLOAK_JWK_SET_URI` optionally selects the reachable key endpoint. Compose
+uses Keycloak's internal hostname for JWKS and the frontend-visible URL as issuer;
+these serve different purposes. Hosted issuer and JWKS URLs must use HTTPS.
+Public-key lookup is lazy and cached: a reachable key endpoint is needed when
+validating a token, not just to start public routes.
+
+Health, hello, Swagger UI and OpenAPI remain public without a token. Other
+management paths are denied, even to an application ADMIN. Only health is exposed
+by Actuator configuration. The API is stateless with no login form, Basic auth,
+cookie session or CSRF cookie. CSRF is disabled for bearer-only requests; MVC CORS
+continues to enforce exact approved frontend origins and preflight headers.
+
+Only realm roles STUDENT/TUTOR/ADMIN map to ROLE_ authorities; malformed, unknown
+or client-role claims do not grant application roles. Method authorization is
+enabled for future business policies. This does not implement user persistence.
+
+Tests use real signed RSA JWTs and a temporary HTTP JWKS server, including bad
+signature, issuer, audience, expiry, not-before, missing subject/expiry and role
+denial. Existing public endpoint and CORS tests stay active.
+Reference: [Spring Security JWT validation](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html).
 
 ## Branches and workflow
 
