@@ -1,2 +1,0 @@
-# Local development profile. One instance per service; it does not prove high availability.
-services: {}

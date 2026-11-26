@@ -4,7 +4,7 @@ Mentor API: Spring Boot (Java 21) modular monolith with DDD.
 
 Part of **Mentor – Learn and teach among peers**, a peer-tutoring web platform for students of Universidad Central del Ecuador.
 
-This folder is part of the `mentor` monorepo: the web app and landing page are in `apps/web-shell` and `apps/landing`; Docker Compose is in this folder; the shared documentation is in `docs/`.
+This folder is part of the `mentor` monorepo: the web app and landing page are in `apps/web-shell` and `apps/landing`; Docker Compose is in this folder; the documentation is in Confluence.
 
 **Owner:** Alquinga Cristopher (@Cristopher2912)
 

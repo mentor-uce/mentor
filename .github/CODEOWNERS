@@ -6,21 +6,13 @@
 
 # Backend and gateway
 /apps/backend/          @Cristopher2912 @Kevin-Moyon
-/apps/gateway/          @Cristopher2912 @Kevin-Moyon
-/packages/contracts/    @Cristopher2912 @Kevin-Moyon
 
 # Web, microfrontends and landing
 /apps/web-shell/        @Milisen03Narvaez @Kevin-Moyon
-/apps/mfe-tutoring/     @Milisen03Narvaez @Kevin-Moyon
-/apps/mfe-admin/        @Milisen03Narvaez @Kevin-Moyon
 /apps/landing/          @Milisen03Narvaez @Kevin-Moyon
-/packages/design-system/ @Milisen03Narvaez @Kevin-Moyon
-/packages/api-client/   @Milisen03Narvaez @Kevin-Moyon
 
 # CI/CD, Docker, infrastructure and workflows (DevOps)
 /.github/               @sarithmijal
-/infra/                 @sarithmijal
-/workflows/             @sarithmijal
 Dockerfile              @sarithmijal
 nginx.conf              @sarithmijal
 .dockerignore           @sarithmijal

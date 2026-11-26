@@ -2,15 +2,16 @@
 
 Peer tutoring platform for Universidad Central del Ecuador. Final project of the Software Architecture and Programming in English courses.
 
-Monorepo layout and decisions: `docs/Mentor_Documento_general_del_sistema_v2.1.md` (section 3). It replaces the former `mentor-backend` and `mentor-frontend` repositories; their history is preserved. Existing code lives in `apps/backend`, `apps/web-shell` and `apps/landing`; the other folders are placeholders to be filled by their Jira tasks.
+Monorepo: one repository for the whole project.
 
 | Folder | Content |
 | --- | --- |
-| apps/ | backend, gateway, web-shell, mfe-tutoring, mfe-admin, landing, mobile, desktop |
-| packages/ | design-system, api-client, contracts, wasm-health |
-| infra/ | docker, aws |
-| workflows/n8n/ | exported n8n workflows |
-| tests/ | E2E, load and integration tests |
-| docs/ | specification, ADRs, diagrams, runbooks, evidence |
+| `apps/backend` | Spring Boot API (Java 21, modular monolith with DDD) and local Docker Compose |
+| `apps/web-shell` | Web application (React + Vite + TypeScript) |
+| `apps/landing` | Landing page (Astro) |
 
-Git flow: `feature/MEN-XX-description` -> PR to `develop` -> CI -> QA -> PR to `main`. PR title: `[MEN-12] feat: add DDD module structure`.
+New apps and shared code (gateway, microfrontends, mobile, desktop, packages, infra, tests) are added under `apps/`, `packages/`, `infra/` and `tests/` when their Jira tasks start.
+
+Documentation (architecture, diagrams, workflow, decisions): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)
+
+Git flow: `feature/MEN-XX-description` -> Pull Request to `develop` (QA) -> Pull Request to `main` (production). Pull Request title: `[MEN-12] feat: add DDD module structure`.
