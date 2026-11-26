@@ -1,0 +1,74 @@
+---
+import StepCard from '../molecules/StepCard.astro';
+
+const tutorSteps = [
+  {
+    stepNumber: 1,
+    title: 'Activate Tutor Mode',
+    description:
+      'Any verified UCE student can unlock tutor capabilities directly from their account without losing student features.',
+  },
+  {
+    stepNumber: 2,
+    title: 'Publish a Tutoring Service',
+    description:
+      'Create listings detailing the subjects you master, focus topics, syllabus scope, and session guidelines.',
+  },
+  {
+    stepNumber: 3,
+    title: 'Define Availability',
+    description:
+      'Set flexible weekly schedules and time windows that align comfortably with your academic commitments.',
+  },
+  {
+    stepNumber: 4,
+    title: 'Confirm a Request',
+    description:
+      'Review pending session bookings from fellow students and confirm sessions in one centralized dashboard.',
+  },
+  {
+    stepNumber: 5,
+    title: 'Complete with Completion Code',
+    description:
+      'Deliver the tutoring session and finalize the encounter securely using a unique verification code provided by the student.',
+  },
+];
+---
+
+<div class="flex flex-col h-full bg-slate-50/70 p-6 md:p-8 rounded-2xl border border-slate-200">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-turquoise/25 text-mentor-deep-turquoise border border-mentor-turquoise/40 uppercase tracking-wide"
+    >
+      Tutor Journey
+    </span>
+    <h3 class="text-xl font-heading font-bold text-mentor-night">
+      How to Share Your Knowledge
+    </h3>
+  </div>
+
+  <p class="text-sm text-slate-600 mb-6">
+    Strengthen your own mastery by teaching others. Earn academic recognition and share your expertise within the UCE community.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
+    {
+      tutorSteps.map((step) => (
+        <StepCard
+          stepNumber={step.stepNumber}
+          title={step.title}
+          description={step.description}
+          roleVariant="tutor"
+          class={step.stepNumber === 5 ? 'sm:col-span-2 lg:col-span-1' : ''}
+        />
+      ))
+    }
+  </div>
+
+  <div class="mt-6 p-3.5 bg-mentor-ice/60 rounded-lg border border-mentor-sky/20 flex items-center gap-3">
+    <div class="w-2 h-2 rounded-full bg-mentor-deep-turquoise shrink-0"></div>
+    <p class="text-xs text-slate-700">
+      <strong class="text-mentor-night">Dual Role Flexibility:</strong> Becoming a tutor does not replace your student status. A single verified account lets you learn and teach whenever you need.
+    </p>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'white';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  class?: string;
+  type?: 'button' | 'submit' | 'reset';
+  target?: string;
+  rel?: string;
+  ariaLabel?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  class: className = '',
+  type = 'button',
+  target,
+  rel,
+  ariaLabel,
+} = Astro.props;
+
+const baseStyles =
+  'inline-flex items-center justify-center font-medium transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer text-center';
+
+const variantStyles: Record<string, string> = {
+  primary:
+    'bg-gradient-ribbon text-white shadow-sm hover:shadow-md hover:brightness-105 focus-visible:ring-mentor-sky',
+  secondary:
+    'bg-mentor-night text-white hover:bg-slate-800 focus-visible:ring-mentor-indigo shadow-sm',
+  outline:
+    'border-2 border-mentor-night text-mentor-night hover:bg-mentor-ice/80 focus-visible:ring-mentor-sky',
+  ghost:
+    'text-mentor-night hover:text-mentor-indigo hover:bg-mentor-ice/60 focus-visible:ring-mentor-indigo',
+  white:
+    'bg-white text-mentor-night hover:bg-mentor-ice shadow-md hover:shadow-lg focus-visible:ring-mentor-sky font-semibold',
+};
+
+const sizeStyles: Record<string, string> = {
+  sm: 'text-xs px-3 py-1.5 gap-1.5',
+  md: 'text-sm px-4 py-2 gap-2',
+  lg: 'text-base px-6 py-3 gap-2.5 font-semibold',
+};
+
+const combinedStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class={combinedStyles}
+      target={target}
+      rel={rel || (target === '_blank' ? 'noopener noreferrer' : undefined)}
+      aria-label={ariaLabel}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={combinedStyles} aria-label={ariaLabel}>
+      <slot />
+    </button>
+  )
+}

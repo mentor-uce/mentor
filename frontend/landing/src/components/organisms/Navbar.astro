@@ -1,0 +1,133 @@
+---
+import Button from '../atoms/Button.astro';
+import Container from '../atoms/Container.astro';
+import Icon from '../atoms/Icon.astro';
+import NavigationLink from '../molecules/NavigationLink.astro';
+
+const navLinks = [
+  { href: '#top', label: 'Home' },
+  { href: '#how-it-works', label: 'How It Works' },
+  { href: '#benefits', label: 'Benefits' },
+  { href: '#trust', label: 'Trust & Security' },
+  { href: '#faq', label: 'FAQ' },
+];
+---
+
+<header
+  class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all duration-200"
+>
+  <Container>
+    <div class="flex items-center justify-between h-16 md:h-20">
+      <!-- Brand Logo -->
+      <a
+        href="#top"
+        class="flex items-center gap-2.5 group rounded-lg focus-visible:ring-2 focus-visible:ring-mentor-sky p-1"
+        aria-label="Mentor Home"
+      >
+        <div
+          class="w-9 h-9 rounded-lg bg-gradient-ribbon flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105"
+        >
+          <Icon name="academic-cap" class="w-5 h-5" />
+        </div>
+        <div class="flex flex-col">
+          <span class="font-heading font-bold text-xl text-mentor-night leading-none tracking-tight">
+            Mentor
+          </span>
+          <span class="text-[10px] uppercase font-semibold tracking-wider text-mentor-deep-turquoise leading-tight">
+            UCE Peer Tutoring
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-1 lg:gap-2" aria-label="Main Navigation">
+        {navLinks.map((link) => (
+          <NavigationLink href={link.href} label={link.label} />
+        ))}
+      </nav>
+
+      <!-- Desktop Action Buttons -->
+      <div class="hidden md:flex items-center gap-3">
+        <Button href="#login" variant="ghost" size="sm" ariaLabel="Sign in to Mentor">
+          Sign In
+        </Button>
+        <Button href="#register" variant="primary" size="sm" ariaLabel="Register for Mentor">
+          Register
+        </Button>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <div class="flex md:hidden">
+        <button
+          type="button"
+          id="mobile-menu-button"
+          class="p-2 rounded-lg text-slate-600 hover:text-mentor-night hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-mentor-sky"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="Toggle navigation menu"
+        >
+          <span id="menu-icon-open">
+            <Icon name="menu" class="w-6 h-6" />
+          </span>
+          <span id="menu-icon-close" class="hidden">
+            <Icon name="close" class="w-6 h-6" />
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div
+      id="mobile-nav"
+      class="hidden md:hidden border-t border-slate-100 py-4 space-y-2 bg-white"
+      aria-label="Mobile Navigation"
+    >
+      <nav class="flex flex-col space-y-1">
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="px-3 py-2 text-base font-medium text-slate-700 hover:text-mentor-indigo hover:bg-mentor-ice/60 rounded-md transition-colors mobile-nav-link"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <div class="pt-4 border-t border-slate-100 flex flex-col gap-2">
+        <Button href="#login" variant="outline" size="md" class="w-full">
+          Sign In
+        </Button>
+        <Button href="#register" variant="primary" size="md" class="w-full">
+          Register
+        </Button>
+      </div>
+    </div>
+  </Container>
+</header>
+
+<script>
+  const menuButton = document.getElementById('mobile-menu-button');
+  const mobileNav = document.getElementById('mobile-nav');
+  const openIcon = document.getElementById('menu-icon-open');
+  const closeIcon = document.getElementById('menu-icon-close');
+  const navLinks = document.querySelectorAll('.mobile-nav-link');
+
+  if (menuButton && mobileNav && openIcon && closeIcon) {
+    const toggleMenu = () => {
+      const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+      menuButton.setAttribute('aria-expanded', String(!isExpanded));
+      mobileNav.classList.toggle('hidden');
+      openIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    };
+
+    menuButton.addEventListener('click', toggleMenu);
+
+    navLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (!mobileNav.classList.contains('hidden')) {
+          toggleMenu();
+        }
+      });
+    });
+  }
+</script>
