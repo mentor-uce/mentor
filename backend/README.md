@@ -474,3 +474,25 @@ This task provides an authenticated ping/pong scaffold, not chat, business-room 
 Anonymous calls return401. This read-only endpoint exposes no credentials, checkout URL or transaction. The scaffold cannot charge, refund, transfer money or approve a payment. Stripe sandbox remains the target for a later integration; setting `PAYMENT_PROVIDER=STRIPE` is rejected until that adapter is implemented.
 
 `VideoProvider.createRoom(UUID bookingId)` currently returns a deterministic dummy room with `provider=DUMMY`, `testMode=true` and `joinable=false`, without an access URL or external request. It does not grant booking/room access or create a real conference. Selecting and implementing an external provider and participant authorization are later business tasks.
+
+## Real Docker/Compose verification (MEN-25)
+
+The root `docker-compose.yml` includes the existing backend Compose model; it does not duplicate services or move the monorepo. Docker Compose2.35+ is required for the safe `config --no-env-resolution` check ([release notes](https://github.com/docker/compose/releases/tag/v2.35.0)). For normal development, copy `backend/.env.example` to `backend/.env`, set distinct local secrets and run from the repository root:
+
+```sh
+docker compose --env-file backend/.env --profile app up --build backend
+curl http://localhost:8080/actuator/health
+```
+
+The response must contain `"status":"UP"`; Spring may also include health-group names. This command starts the backend and its dependencies without building unfinished frontend applications. The image runs as the `mentor` user. Existing `backend/` Compose commands remain valid.
+
+For a reproducible disposable check, run from `backend/` with Python3, Node and Docker available:
+
+```sh
+npm ci --prefix scripts/socketio-check --ignore-scripts --no-audit --no-fund
+python scripts/verify_compose.py
+```
+
+The verifier renders the actual root Compose model without loading service `.env` files, supplies generated synthetic secrets, builds the actual Dockerfile and uses a unique project, isolated volumes and dynamic loopback ports. It checks HTTP `UP`, the real Compose healthcheck, nonroot execution, anonymous401, three Keycloak PKCE identities, simulated payment status and Socket.IO4 JavaScript ping/pong against the running container. It removes only its owned project resources and generated image; existing development volumes are not used or deleted. It does not deploy to cloud services.
+
+CI executes the same verifier with `--image mentor-backend:ci` after building that exact image in the same job. The root Compose entrypoint is included in backend CI path filters. Java unit/integration checks and real Keycloak/JAR verification continue to run too.

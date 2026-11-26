@@ -1,0 +1,5 @@
+# Single source of truth remains in backend/. Run from the monorepo root:
+# docker compose --env-file backend/.env --profile app up --build backend
+include:
+  - path: ./backend/docker-compose.yml
+    project_directory: ./backend

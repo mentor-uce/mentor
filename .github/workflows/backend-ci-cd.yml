@@ -10,10 +10,10 @@ name: Backend CI/CD
 on:
   pull_request:
     branches: [develop, main]
-    paths: ['backend/**', '.github/workflows/backend-ci-cd.yml']
+    paths: ['backend/**', 'docker-compose.yml', '.github/workflows/backend-ci-cd.yml']
   push:
     branches: [develop, main]
-    paths: ['backend/**', '.github/workflows/backend-ci-cd.yml']
+    paths: ['backend/**', 'docker-compose.yml', '.github/workflows/backend-ci-cd.yml']
   workflow_dispatch:
 
 concurrency:
@@ -61,6 +61,14 @@ jobs:
       - name: Build the Docker image
         if: steps.exists.outputs.found == 'true'
         run: docker build -t mentor-backend:ci .
+
+      - name: Install Socket.IO runtime smoke client
+        if: steps.exists.outputs.found == 'true'
+        run: npm ci --prefix scripts/socketio-check --ignore-scripts --no-audit --no-fund
+
+      - name: Verify Compose runtime health, auth and Socket.IO
+        if: steps.exists.outputs.found == 'true'
+        run: python3 scripts/verify_compose.py --image mentor-backend:ci
 
   docker-compose:
     name: Docker Compose config
