@@ -1,0 +1,66 @@
+{
+  "realm": "mentor",
+  "enabled": true,
+  "displayName": "Mentor local development",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "bruteForceProtected": true,
+  "defaultSignatureAlgorithm": "RS256",
+  "roles": {
+    "realm": [
+      {"name": "STUDENT"},
+      {"name": "TUTOR", "composite": true, "composites": {"realm": ["STUDENT"]}},
+      {"name": "ADMIN"}
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "mentor-web",
+      "name": "Mentor web (local PKCE)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": ["http://localhost:5173/*", "http://127.0.0.1:5173/*"],
+      "webOrigins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+      "attributes": {"pkce.code.challenge.method": "S256"},
+      "defaultClientScopes": ["basic", "profile", "email", "roles", "web-origins"],
+      "protocolMappers": [
+        {
+          "name": "mentor-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {"included.custom.audience": "mentor-api", "access.token.claim": "true", "id.token.claim": "false"}
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "student.local", "enabled": true, "emailVerified": true,
+      "firstName": "Local", "lastName": "Student", "email": "student@example.invalid",
+      "realmRoles": ["STUDENT"], "requiredActions": [],
+      "credentials": [{"type": "password", "value": "${MENTOR_TEST_STUDENT_PASSWORD}", "temporary": false}]
+    },
+    {
+      "username": "tutor.local", "enabled": true, "emailVerified": true,
+      "firstName": "Local", "lastName": "Tutor", "email": "tutor@example.invalid",
+      "realmRoles": ["TUTOR"], "requiredActions": [],
+      "credentials": [{"type": "password", "value": "${MENTOR_TEST_TUTOR_PASSWORD}", "temporary": false}]
+    },
+    {
+      "username": "admin.local", "enabled": true, "emailVerified": true,
+      "firstName": "Local", "lastName": "Admin", "email": "admin@example.invalid",
+      "realmRoles": ["ADMIN"], "requiredActions": [],
+      "credentials": [{"type": "password", "value": "${MENTOR_TEST_ADMIN_PASSWORD}", "temporary": false}]
+    }
+  ]
+}
