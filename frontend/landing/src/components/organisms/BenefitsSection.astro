@@ -1,0 +1,80 @@
+---
+import Container from '../atoms/Container.astro';
+import FeatureItem from '../molecules/FeatureItem.astro';
+
+const benefits = [
+  {
+    title: 'Relatable Peer Explanations',
+    description:
+      'Learn from peers who recently passed the same subjects and understand the exact classroom challenges and exam approaches.',
+    icon: 'user-group' as const,
+    badge: 'Peer Support',
+  },
+  {
+    title: 'Teaching Deepens Mastery',
+    description:
+      'Explaining complex concepts to others reinforces your own understanding, strengthening long-term retention and academic confidence.',
+    icon: 'academic-cap' as const,
+    badge: 'Dual Growth',
+  },
+  {
+    title: 'Organized & Reliable Scheduling',
+    description:
+      'Say goodbye to lost messages in noisy chat groups. Coordinate availability, bookings, and locations within a dedicated interface.',
+    icon: 'calendar' as const,
+    badge: 'Structure',
+  },
+  {
+    title: 'Trust Built on Feedback',
+    description:
+      'Ratings and reviews submitted only after verified sessions help you choose experienced tutors with confidence.',
+    icon: 'shield-check' as const,
+    badge: 'Accountability',
+  },
+  {
+    title: 'Community-Driven Knowledge',
+    description:
+      'Build academic networks across faculties and semesters, fostering collaborative learning throughout Universidad Central del Ecuador.',
+    icon: 'book-open' as const,
+    badge: 'Community',
+  },
+  {
+    title: 'Flexible Single Account',
+    description:
+      'Switch between learning and teaching seamlessly. Activate tutor mode whenever you feel confident in a specific course.',
+    icon: 'sparkles' as const,
+    badge: 'Flexibility',
+  },
+];
+---
+
+<section id="benefits" class="py-16 md:py-24 bg-white border-t border-slate-100">
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
+      >
+        Platform Advantages
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
+        Why Peer Tutoring with Mentor?
+      </h2>
+      <p class="text-base text-slate-600 leading-relaxed">
+        Peer-to-peer education bridges the gap between formal lectures and personal study, creating an environment where teaching and learning thrive together.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        benefits.map((item) => (
+          <FeatureItem
+            title={item.title}
+            description={item.description}
+            icon={item.icon}
+            badge={item.badge}
+          />
+        ))
+      }
+    </div>
+  </Container>
+</section>
