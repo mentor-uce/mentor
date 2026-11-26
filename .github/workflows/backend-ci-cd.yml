@@ -54,6 +54,10 @@ jobs:
         if: steps.exists.outputs.found == 'true'
         run: mvn -B verify
 
+      - name: Verify local Keycloak realm and PKCE
+        if: steps.exists.outputs.found == 'true'
+        run: python3 scripts/verify_keycloak.py --backend-jar target/mentor-backend-0.0.1-SNAPSHOT.jar --expect-me
+
       - name: Build the Docker image
         if: steps.exists.outputs.found == 'true'
         run: docker build -t mentor-backend:ci .
@@ -67,7 +71,7 @@ jobs:
       - name: Validate docker-compose.yml
         run: |
           cp .env.example .env
-          sed -i 's/^POSTGRES_PASSWORD=$/POSTGRES_PASSWORD=ci/; s/^MONGO_PASSWORD=$/MONGO_PASSWORD=ci/; s/^REDIS_PASSWORD=$/REDIS_PASSWORD=ci/; s/^KEYCLOAK_ADMIN_PASSWORD=$/KEYCLOAK_ADMIN_PASSWORD=ci/' .env
+          sed -i 's/^POSTGRES_PASSWORD=$/POSTGRES_PASSWORD=ci/; s/^MONGO_PASSWORD=$/MONGO_PASSWORD=ci/; s/^REDIS_PASSWORD=$/REDIS_PASSWORD=ci/; s/^KEYCLOAK_ADMIN_PASSWORD=$/KEYCLOAK_ADMIN_PASSWORD=ci/; s/^MENTOR_TEST_STUDENT_PASSWORD=$/MENTOR_TEST_STUDENT_PASSWORD=ci-student/; s/^MENTOR_TEST_TUTOR_PASSWORD=$/MENTOR_TEST_TUTOR_PASSWORD=ci-tutor/; s/^MENTOR_TEST_ADMIN_PASSWORD=$/MENTOR_TEST_ADMIN_PASSWORD=ci-admin/' .env
           docker compose --profile app --profile automation config --quiet
 
   ci-ok:
