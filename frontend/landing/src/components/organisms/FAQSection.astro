@@ -1,48 +1,62 @@
 ---
+/**
+ * FAQSection Organism
+ *
+ * Implements accessible accordion items addressing the 8 core questions
+ * about Mentor as defined in Document 00 and Document 08:
+ * 1. ¿Qué es Mentor?
+ * 2. ¿Quiénes pueden utilizar Mentor?
+ * 3. ¿Cómo puedo convertirme en tutor?
+ * 4. ¿Las tutorías son gratuitas o tienen costo?
+ * 5. ¿Cómo funcionan las solicitudes de tutoría?
+ * 6. ¿Cómo se completan las sesiones de tutoría?
+ * 7. ¿Cómo funciona la verificación de correo electrónico?
+ * 8. ¿Mentor procesa pagos reales?
+ */
 import Container from '../atoms/Container.astro';
 import FAQItem from '../molecules/FAQItem.astro';
 
 const faqs = [
   {
-    question: '1. What is Mentor?',
+    question: '1. ¿Qué es Mentor?',
     answer:
-      'Mentor is an academic peer-tutoring web platform developed for students at Universidad Central del Ecuador (UCE). It connects students seeking to improve their understanding of complex subjects with classmates who have successfully completed those courses and want to teach.',
+      'Mentor es una plataforma web de tutorías académicas entre pares diseñada específicamente para la comunidad estudiantil de la Universidad Central del Ecuador (UCE). Conecta a estudiantes que necesitan reforzar materias complejas con compañeros destacados que ya las aprobaron y desean enseñar.',
     open: true,
   },
   {
-    question: '2. Who can use Mentor?',
+    question: '2. ¿Quiénes pueden utilizar Mentor?',
     answer:
-      'Mentor is designed for active undergraduate students enrolled at Universidad Central del Ecuador who hold an official @uce.edu.ec university email address.',
+      'Mentor está dirigido a estudiantes de pregrado matriculados en la Universidad Central del Ecuador que cuenten con una cuenta de correo electrónico institucional activa (@uce.edu.ec).',
   },
   {
-    question: '3. How can I become a tutor?',
+    question: '3. ¿Cómo puedo convertirme en tutor?',
     answer:
-      'Once you register and verify your university email, you can activate Tutor Mode directly from your profile dashboard. You do not lose your student privileges—a single account allows you to schedule sessions as a student or offer tutoring services as a tutor.',
+      'Una vez registrado y verificado tu correo institucional, puedes activar el "Modo Tutor" desde tu panel de perfil. No pierdes tu condición de estudiante: con una sola cuenta puedes solicitar tutorías o impartirlas según tus materias aprobadas.',
   },
   {
-    question: '4. Are tutoring services free or paid?',
+    question: '4. ¿Las tutorías son gratuitas o tienen costo?',
     answer:
-      'Tutors may publish free peer sessions or define nominal rates for academic support. However, all platform payment flows currently operate using Stripe strictly in test mode. No real money or actual monetary charges are processed.',
+      'Los tutores pueden ofrecer tutorías solidarias gratuitas o establecer una tarifa por hora por su tiempo y dedicación académica. Todas las transacciones se realizan mediante Stripe en modo de prueba estrictamente académico.',
   },
   {
-    question: '5. How do tutoring requests work?',
+    question: '5. ¿Cómo funcionan las solicitudes de tutoría?',
     answer:
-      'Students browse available courses and tutor schedules, choose a convenient date and time, and send a structured booking request. The tutor receives the notification and can confirm or decline the session based on availability.',
+      'El estudiante busca la materia y tutor de su interés, elige fecha, hora y modalidad (presencial u online) y envía la solicitud. El tutor recibe la notificación y confirma la reserva según su disponibilidad horaria.',
   },
   {
-    question: '6. How are tutoring sessions completed?',
+    question: '6. ¿Cómo se confirman y completan las sesiones?',
     answer:
-      'At the conclusion of the session, the student provides the tutor with a unique 6-digit session completion code. Once the tutor inputs this code into the platform, the session is officially marked as completed, unlocking student reviews.',
+      'Al terminar la clase, el estudiante le facilita un código seguro de finalización de 6 dígitos al tutor. Al ingresar este código en la plataforma, la tutoría se marca oficialmente como realizada, habilitando la calificación y reseña.',
   },
   {
-    question: '7. How does email verification work?',
+    question: '7. ¿Cómo funciona la verificación de correo electrónico?',
     answer:
-      'During registration, a verification link or code is dispatched to your active @uce.edu.ec student email address. Verifying your inbox confirms your affiliation with Universidad Central del Ecuador before you can request or host sessions.',
+      'Al registrarte, enviamos un enlace de validación a tu dirección @uce.edu.ec. Al confirmar tu bandeja de entrada aseguras tu pertenencia activa a la Universidad Central del Ecuador antes de agendar o publicar sesiones.',
   },
   {
-    question: '8. Does Mentor process real payments?',
+    question: '8. ¿Mentor procesa pagos reales o cobra a tarjetas de crédito?',
     answer:
-      'No. Mentor does not process real payments or real credit card transactions. The payment system is integrated with Stripe in test sandbox mode solely for academic demonstration and software architecture evaluation.',
+      'No. Mentor no realiza cobros con dinero real. La pasarela de pago con Stripe está configurada exclusivamente en entorno sandbox / pruebas con fines didácticos y de evaluación para la cátedra de Arquitectura de Software.',
   },
 ];
 ---
@@ -53,13 +67,13 @@ const faqs = [
       <span
         class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
       >
-        Got Questions?
+        Preguntas y Respuestas
       </span>
       <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
-        Frequently Asked Questions
+        Preguntas Frecuentes
       </h2>
       <p class="text-base text-slate-600 leading-relaxed">
-        Find quick answers regarding our peer tutoring guidelines, safety procedures, and platform usage.
+        Todo lo que necesitas saber sobre el funcionamiento, seguridad y políticas de tutorías entre pares en Mentor.
       </p>
     </div>
 

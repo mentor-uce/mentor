@@ -1,4 +1,10 @@
 ---
+/**
+ * FinalCTASection Organism
+ *
+ * Prominent call-to-action banner styled with the Cinta gradient
+ * (#38BDF8 -> #6366F1) inviting UCE students to register or log in.
+ */
 import Button from '../atoms/Button.astro';
 import Container from '../atoms/Container.astro';
 import Icon from '../atoms/Icon.astro';
@@ -9,13 +15,13 @@ import Icon from '../atoms/Icon.astro';
     <div
       class="relative rounded-3xl overflow-hidden bg-gradient-ribbon px-6 py-14 sm:px-12 sm:py-20 text-center text-white shadow-xl"
     >
-      <!-- Background pattern -->
+      <!-- Decorative ambient shapes in White and Turquoise -->
       <div
         class="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-white/10 blur-2xl pointer-events-none"
         aria-hidden="true"
       ></div>
       <div
-        class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-mentor-turquoise/20 blur-2xl pointer-events-none"
+        class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-mentor-turquoise/25 blur-2xl pointer-events-none"
         aria-hidden="true"
       ></div>
 
@@ -23,15 +29,15 @@ import Icon from '../atoms/Icon.astro';
         <span
           class="inline-block px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm border border-white/25"
         >
-          Join Your Classmates Today
+          Únete a tus compañeros hoy
         </span>
 
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold font-heading text-white tracking-tight">
-          Ready to Elevate Your University Journey?
+          ¿Listo para mejorar tu rendimiento académico?
         </h2>
 
-        <p class="text-base sm:text-lg text-white/90 leading-relaxed max-w-xl mx-auto">
-          Sign up with your @uce.edu.ec student email to get academic tutoring assistance or start earning recognition as a tutor.
+        <p class="text-base sm:text-lg text-white/95 leading-relaxed max-w-xl mx-auto">
+          Crea tu cuenta con tu correo institucional @uce.edu.ec para solicitar tutorías en tus materias o empezar a compartir tu experiencia como tutor.
         </p>
 
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -41,7 +47,7 @@ import Icon from '../atoms/Icon.astro';
             size="lg"
             class="w-full sm:w-auto text-mentor-night hover:bg-mentor-ice shadow-lg"
           >
-            <span>Create Your Account</span>
+            <span>Crear mi cuenta</span>
             <Icon name="arrow-right" class="w-4 h-4 ml-1" />
           </Button>
 
@@ -51,12 +57,12 @@ import Icon from '../atoms/Icon.astro';
             size="lg"
             class="w-full sm:w-auto text-white hover:text-white hover:bg-white/15"
           >
-            <span>Already have an account? Sign in</span>
+            <span>¿Ya tienes cuenta? Iniciar sesión</span>
           </Button>
         </div>
 
         <p class="text-xs text-white/80 pt-2">
-          Strictly for Universidad Central del Ecuador students.
+          Exclusivo para la comunidad de la Universidad Central del Ecuador.
         </p>
       </div>
     </div>

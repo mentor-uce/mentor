@@ -1,0 +1,120 @@
+---
+/**
+ * MentorLogo Component
+ *
+ * Implements the official Mentor logo and isotype defined in the Brand Manual (Manual de Marca):
+ * - Isotype: Two figures (Tutor in solid color, Student in Sky-Indigo gradient) connected over an open book.
+ * - Wordmark: "Mentor" in Poppins bold with correct 2x safe zone proportions.
+ * - Tagline: "Enseñar también es aprender" (Teaching is also learning) with Sky-Indigo gradient accent.
+ *
+ * Supported variants:
+ * - 'horizontal' (default): Isotype on the left, wordmark and tagline on the right.
+ * - 'vertical': Isotype on top, wordmark and tagline centered below.
+ * - 'isotype-only': Just the icon mark for compact spaces and avatars.
+ *
+ * Supported themes:
+ * - 'color-on-light': For white or ice (#E6F4F8) backgrounds (tutor in #0B1220, student in gradient).
+ * - 'color-on-dark': For night (#0B1220) backgrounds (tutor in #FFFFFF, student in gradient).
+ * - 'white': Monochrome white for deep indigo/night backgrounds.
+ */
+
+interface Props {
+  variant?: 'horizontal' | 'vertical' | 'isotype-only';
+  theme?: 'color-on-light' | 'color-on-dark' | 'white';
+  showTagline?: boolean;
+  class?: string;
+  isotypeSize?: number;
+}
+
+const {
+  variant = 'horizontal',
+  theme = 'color-on-light',
+  showTagline = true,
+  class: className = '',
+  isotypeSize = 40,
+} = Astro.props;
+
+// Color logic according to Brand Manual guidelines
+const isDark = theme === 'color-on-dark';
+const isWhite = theme === 'white';
+
+const tutorColor = isDark || isWhite ? '#FFFFFF' : '#0B1220';
+const wordmarkColor = isDark || isWhite ? 'text-white' : 'text-mentor-night';
+const bookColor = isDark || isWhite ? '#FFFFFF' : '#0B1220';
+const bridgeColor = isWhite ? '#FFFFFF' : '#38BDF8';
+const studentFill = isWhite ? '#FFFFFF' : 'url(#student-gradient)';
+const studentHeadFill = isWhite ? '#FFFFFF' : '#38BDF8';
+---
+
+<div class={`inline-flex items-center ${variant === 'vertical' ? 'flex-col text-center' : 'flex-row text-left'} ${className}`}>
+  <!-- Isotype SVG -->
+  <div class="relative shrink-0 flex items-center justify-center" style={`width: ${isotypeSize}px; height: ${isotypeSize}px;`}>
+    <svg
+      viewBox="0 0 100 100"
+      width={isotypeSize}
+      height={isotypeSize}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      class="overflow-visible"
+      aria-hidden="true"
+    >
+      <defs>
+        <!-- Cinta Gradient: Sky (#38BDF8) to Indigo (#6366F1) -->
+        <linearGradient id="student-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38BDF8" />
+          <stop offset="100%" stop-color="#6366F1" />
+        </linearGradient>
+      </defs>
+
+      <!-- Figure A: Tutor (Who teaches) -->
+      <!-- Head -->
+      <circle cx="36" cy="22" r="8" fill={tutorColor} />
+      <!-- Torso & Left Arm -->
+      <path
+        d="M 31 34 C 24 34 18 40 18 48 L 18 70 C 18 73 21 76 24 76 L 27 76 C 30 76 33 73 33 70 L 33 52 C 33 48 39 45 46 45 C 49 45 52 46 54 47 C 50 40 42 34 31 34 Z"
+        fill={tutorColor}
+      />
+
+      <!-- Figure B: Student (Who learns, in Cinta gradient) -->
+      <!-- Head -->
+      <circle cx="64" cy="22" r="8" fill={studentHeadFill} />
+      <!-- Torso & Right Arm -->
+      <path
+        d="M 69 34 C 76 34 82 40 82 48 L 82 70 C 82 73 79 76 76 76 L 73 76 C 70 76 67 73 67 70 L 67 52 C 67 48 61 45 54 45 C 51 45 48 46 46 47 C 50 40 58 34 69 34 Z"
+        fill={studentFill}
+      />
+
+      <!-- Connecting Hand / Bridge (Uniting tutor and student) -->
+      <path
+        d="M 35 48 C 44 44 56 44 65 48 C 57 54 43 54 35 48 Z"
+        fill={bridgeColor}
+      />
+
+      <!-- Item C: Open Book (Shared knowledge uniting both) -->
+      <!-- Left Page -->
+      <path
+        d="M 50 71 C 45 65 34 62 25 62 L 25 72 C 34 72 44 75 50 82 Z"
+        fill={bookColor}
+      />
+      <!-- Right Page -->
+      <path
+        d="M 50 71 C 55 65 66 62 75 62 L 75 72 C 66 72 56 75 50 82 Z"
+        fill={bookColor}
+      />
+    </svg>
+  </div>
+
+  <!-- Wordmark & Tagline (Shown if not isotype-only) -->
+  {variant !== 'isotype-only' && (
+    <div class={variant === 'vertical' ? 'mt-2.5 flex flex-col items-center' : 'ml-3 flex flex-col justify-center'}>
+      <span class={`font-heading font-bold tracking-tight text-xl sm:text-2xl leading-none ${wordmarkColor}`}>
+        Mentor
+      </span>
+      {showTagline && (
+        <span class={`text-[11px] sm:text-xs font-semibold tracking-normal mt-1 leading-tight ${isDark ? 'text-mentor-sky' : isWhite ? 'text-white/90' : 'text-transparent bg-gradient-ribbon bg-clip-text'}`}>
+          Enseñar también es aprender
+        </span>
+      )}
+    </div>
+  )}
+</div>
