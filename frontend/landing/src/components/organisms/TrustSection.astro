@@ -1,0 +1,99 @@
+---
+/**
+ * TrustSection Organism
+ *
+ * Implements the dark trust section adhering to the Mentor Brand Manual:
+ * - Background color: Noche (#0B1220)
+ * - Accent highlights: Turquesa (#2DD4BF) and Turquesa Profundo (#0D9488)
+ * - Details 4 institutional pillars:
+ *   1. Verificación obligatoria con correo @uce.edu.ec
+ *   2. Tutores compañeros autenticados
+ *   3. Código de finalización seguro para cada tutoría
+ *   4. Reseñas genuinas post-sesión
+ * - Transparent notice regarding Stripe demonstration test mode
+ */
+import Container from '../atoms/Container.astro';
+import Icon from '../atoms/Icon.astro';
+
+const trustPillars = [
+  {
+    title: 'Verificación con correo institucional UCE',
+    description:
+      'El registro exige una dirección activa @uce.edu.ec para asegurar que la comunidad de tutorías esté conformada exclusivamente por miembros universitarios legítimos.',
+    icon: 'shield-check' as const,
+  },
+  {
+    title: 'Tutores pares verificados',
+    description:
+      'Solo estudiantes registrados con cuenta validada pueden activar el modo tutor y publicar ofertas de asignaturas cursadas.',
+    icon: 'academic-cap' as const,
+  },
+  {
+    title: 'Código seguro de finalización',
+    description:
+      'Cada sesión concluye únicamente cuando el estudiante comparte un código de 6 dígitos con el tutor, garantizando conformidad mutua de que el encuentro se realizó.',
+    icon: 'lock' as const,
+  },
+  {
+    title: 'Reseñas legítimas post-tutoría',
+    description:
+      'Las valoraciones solo pueden enviarse al completarse la sesión. No se admiten valoraciones anónimas ni perfiles ficticios.',
+    icon: 'star' as const,
+  },
+];
+---
+
+<section id="trust" class="py-16 md:py-24 bg-mentor-night text-white relative overflow-hidden">
+  <!-- Accent ambient glow in Indigo & Turquoise according to Brand Manual -->
+  <div
+    class="absolute -bottom-24 -right-24 w-96 h-96 bg-mentor-indigo/20 rounded-full blur-3xl pointer-events-none"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="absolute -top-24 -left-24 w-80 h-80 bg-mentor-turquoise/15 rounded-full blur-3xl pointer-events-none"
+    aria-hidden="true"
+  ></div>
+
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-turquoise bg-mentor-deep-turquoise/30 rounded-full border border-mentor-turquoise/30"
+      >
+        Seguridad e Integridad Académica
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-white mb-4">
+        Confianza construida entre compañeros
+      </h2>
+      <p class="text-base text-slate-300 leading-relaxed">
+        Mentor implementa reglas claras para garantizar un ambiente colaborativo, formal y respetuoso en toda la comunidad universitaria.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {
+        trustPillars.map((pillar) => (
+          <div class="flex items-start gap-4 p-6 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-mentor-deep-turquoise/25 text-mentor-turquoise flex items-center justify-center shrink-0">
+              <Icon name={pillar.icon} class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="font-heading font-semibold text-white text-base mb-2">
+                {pillar.title}
+              </h3>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                {pillar.description}
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Transparent Notice on Payment & Academic Scope -->
+    <div class="mt-12 max-w-3xl mx-auto p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-center">
+      <p class="text-xs text-slate-300 leading-relaxed">
+        <strong class="text-mentor-sky">Aviso de Entorno Académico:</strong> Los pagos y transacciones en esta plataforma utilizan Stripe estrictamente en modo de prueba para fines de demostración académica y arquitectura de software. No se procesan cobros monetarios reales.
+      </p>
+    </div>
+  </Container>
+</section>

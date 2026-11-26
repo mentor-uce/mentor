@@ -1,0 +1,91 @@
+---
+/**
+ * BenefitsSection Organism
+ *
+ * Details the 6 key advantages of peer-to-peer tutoring in Mentor:
+ * - Explicaciones cercanas entre pares
+ * - Enseñar profundiza el dominio (Enseñar también es aprender)
+ * - Horarios organizados sin chats ruidosos
+ * - Confianza basada en reseñas reales
+ * - Comunidad y conocimiento compartido
+ * - Cuenta única y flexible (Estudiante y Tutor)
+ */
+import Container from '../atoms/Container.astro';
+import FeatureItem from '../molecules/FeatureItem.astro';
+
+const benefits = [
+  {
+    title: 'Explicaciones cercanas entre compañeros',
+    description:
+      'Aprende de compañeros que cursaron recientemente la misma materia y entienden con exactitud el enfoque del docente y los puntos difíciles del examen.',
+    icon: 'user-group' as const,
+    badge: 'Apoyo entre pares',
+  },
+  {
+    title: 'Enseñar refuerza tu propio dominio',
+    description:
+      'Explicar conceptos a otros estudiantes consolida tu comprensión a largo plazo y potencia tus habilidades de comunicación académica.',
+    icon: 'academic-cap' as const,
+    badge: 'Crecimiento dual',
+  },
+  {
+    title: 'Coordinación formal y sin desorden',
+    description:
+      'Olvídate de los mensajes perdidos en grupos de chat multitudinarios. Gestiona solicitudes, modalidades y fechas en una interfaz dedicada.',
+    icon: 'calendar' as const,
+    badge: 'Organización',
+  },
+  {
+    title: 'Confianza y evaluación verificada',
+    description:
+      'Las calificaciones y reseñas solo pueden emitirse tras finalizar una sesión validada con código, evitando opiniones falsas o anónimas.',
+    icon: 'shield-check' as const,
+    badge: 'Transparencia',
+  },
+  {
+    title: 'Comunidad universitaria conectada',
+    description:
+      'Construye redes de estudio entre diferentes carreras y semestres dentro de la Universidad Central del Ecuador.',
+    icon: 'book-open' as const,
+    badge: 'Comunidad UCE',
+  },
+  {
+    title: 'Rol dual con una sola cuenta',
+    description:
+      'Alterna entre aprender y enseñar sin crear cuentas separadas. Activa el modo tutor cuando te sientas listo para compartir tu experiencia.',
+    icon: 'sparkles' as const,
+    badge: 'Flexibilidad',
+  },
+];
+---
+
+<section id="benefits" class="py-16 md:py-24 bg-white border-t border-slate-100">
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
+      >
+        Ventajas de la Plataforma
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
+        ¿Por qué elegir tutorías entre pares con Mentor?
+      </h2>
+      <p class="text-base text-slate-600 leading-relaxed">
+        El aprendizaje entre pares complementa las clases magistrales con un espacio empático y colaborativo donde enseñar también es aprender.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        benefits.map((item) => (
+          <FeatureItem
+            title={item.title}
+            description={item.description}
+            icon={item.icon}
+            badge={item.badge}
+          />
+        ))
+      }
+    </div>
+  </Container>
+</section>

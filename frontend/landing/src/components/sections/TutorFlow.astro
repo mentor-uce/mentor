@@ -1,0 +1,84 @@
+---
+/**
+ * TutorFlow Section
+ *
+ * Explains the 5-step journey for a student acting as an academic tutor:
+ * 1. Activar Modo Tutor (Activate Tutor Mode)
+ * 2. Publicar oferta de tutoría (Publish a Tutoring Service)
+ * 3. Definir disponibilidad (Define Availability)
+ * 4. Confirmar solicitud (Confirm a Request)
+ * 5. Finalizar con código (Complete with Completion Code)
+ */
+import StepCard from '../molecules/StepCard.astro';
+
+const tutorSteps = [
+  {
+    stepNumber: 1,
+    title: 'Activar Modo Tutor',
+    description:
+      'Cualquier estudiante verificado de la UCE puede activar el rol de tutor desde su perfil sin perder sus privilegios de estudiante.',
+  },
+  {
+    stepNumber: 2,
+    title: 'Publicar oferta de tutoría',
+    description:
+      'Registra las asignaturas que dominas, temas clave a reforzar, modalidad y condiciones de la sesión.',
+  },
+  {
+    stepNumber: 3,
+    title: 'Definir disponibilidad',
+    description:
+      'Establece tus franjas horarias y días disponibles para coordinar sesiones sin descuidar tus propias clases.',
+  },
+  {
+    stepNumber: 4,
+    title: 'Confirmar solicitud',
+    description:
+      'Revisa las reservas solicitadas por compañeros y acéptalas con un clic desde tu panel de tutor.',
+  },
+  {
+    stepNumber: 5,
+    title: 'Finalizar con código',
+    description:
+      'Imparte la tutoría e ingresa el código de 6 dígitos que te entrega el estudiante para registrar la sesión como completada.',
+  },
+];
+---
+
+<div class="flex flex-col h-full bg-slate-50/70 p-6 md:p-8 rounded-2xl border border-slate-200">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-turquoise/25 text-mentor-deep-turquoise border border-mentor-turquoise/40 uppercase tracking-wide"
+    >
+      Ruta del Tutor
+    </span>
+    <h3 class="text-xl font-heading font-bold text-mentor-night">
+      Cómo compartir tu conocimiento
+    </h3>
+  </div>
+
+  <p class="text-sm text-slate-600 mb-6">
+    Consolida tu aprendizaje al enseñar a otros. Gana reconocimiento académico y apoya a la comunidad de la UCE.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
+    {
+      tutorSteps.map((step) => (
+        <StepCard
+          stepNumber={step.stepNumber}
+          title={step.title}
+          description={step.description}
+          roleVariant="tutor"
+          class={step.stepNumber === 5 ? 'sm:col-span-2 lg:col-span-1' : ''}
+        />
+      ))
+    }
+  </div>
+
+  <div class="mt-6 p-3.5 bg-mentor-ice/60 rounded-lg border border-mentor-sky/20 flex items-center gap-3">
+    <div class="w-2 h-2 rounded-full bg-mentor-deep-turquoise shrink-0"></div>
+    <p class="text-xs text-slate-700">
+      <strong class="text-mentor-night">Flexibilidad de rol dual:</strong> Ser tutor no te quita tu rol de estudiante. Con una sola cuenta institucional puedes aprender y enseñar cuando lo decidas.
+    </p>
+  </div>
+</div>

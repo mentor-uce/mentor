@@ -11,30 +11,31 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Web app and landing page: `frontend/web` and `frontend/landing` of this monorepo
 - **Documentation (architecture, diagrams, workflow): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)**
 
-## Current implementation (MEN-11)
+## Current implementation
 
 - Java 21 and Spring Boot 4.2.0
 - Spring MVC with an embedded HTTP server
 - Maven 3.10.1 through the checked-in Maven Wrapper
-- An automated Spring application context startup test
+- Actuator health, GET `/api/v1/hello`, OpenAPI and Swagger UI
+- Configurable API CORS and optional local-profile `.env` import
+- Spring Data JPA and PostgreSQL connection configured through environment variables
+- HTTP smoke and startup connectivity tests against temporary PostgreSQL containers
 
-The base application starts without databases, Keycloak or payment credentials.
-Business modules, health checks, Swagger and external integrations belong to
-their respective Jira tasks. Visiting `/` currently returns HTTP 404 because
-no business routes exist yet.
+The application now requires a reachable PostgreSQL database and its credentials. Keycloak and payment integrations remain planned.
+Business modules and external integrations remain in their respective Jira tasks. The root `/` remains unmapped; use `/api/v1/hello` for an API check.
 
 ## Target tech stack
 
 - Java 21 + Spring Boot
 - Spring Security as an OAuth 2.0 resource server (validates the Keycloak JWT and applies roles)
 - REST /api/v1 documented with OpenAPI (springdoc) and GraphQL (Spring for GraphQL)
-- WebSocket (STOMP) for chat, live status and WebRTC signaling
-- Spring Data JPA (PostgreSQL + pgvector), Spring Data MongoDB and Spring Data Redis
+- Socket.IO for chat and live status (compatibility proof in MEN-23)
+- Spring Data JPA (PostgreSQL/Supabase), Spring Data MongoDB, Spring Data Redis and a Qdrant adapter
 - Spring Boot Actuator (`/actuator/health` is used by the Docker health check)
 - JUnit Jupiter and Mockito for tests (versions managed by Spring Boot)
 - Maven as the build tool
 
-## Package structure (MEN-12)
+## Existing package structure
 
 The application root package is `com.mentor`. The following module packages
 each contain `presentation`, `application`, `domain` and `infrastructure`:
@@ -79,7 +80,7 @@ pinned version on first use.
 ```powershell
 .\mvnw.cmd -v                  # confirm Maven and Java versions
 .\mvnw.cmd clean verify        # compile, run tests and package the application
-.\mvnw.cmd spring-boot:run     # run locally on port 8080
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local'  # loads local .env
 ```
 
 ### Linux / macOS
@@ -87,7 +88,7 @@ pinned version on first use.
 ```bash
 ./mvnw -v
 ./mvnw clean verify
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 ### Run the packaged application
@@ -95,23 +96,132 @@ pinned version on first use.
 After a successful build:
 
 ```bash
-java -jar target/mentor-backend-0.0.1-SNAPSHOT.jar
+java -jar target/mentor-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
 ```
 
 The default port is `8080`. Set `SERVER_PORT` or pass `--server.port=8082` to
 change it. Stop the application with `Ctrl+C`.
 
-The application needs no service credentials or application-specific environment
-variables for this base local run. The `.env.example` file documents future
-integrations; Spring Boot does not automatically load it during a direct run.
-When those integrations are implemented, start their infrastructure using the
-Docker Compose file in this folder (`docker-compose.yml`):
-`docker compose up -d` starts PostgreSQL, MongoDB, Redis and Keycloak; add
-`--profile automation` to start n8n. Never commit `.env` files or real credentials.
+For local runs, copy `.env.example` to `.env` if it does not already exist,
+set `POSTGRES_PASSWORD` and activate the `local` profile. This imports the
+optional `.env` from the process working directory. Use `KEY=value` syntax
+without shell quoting or `export`. Real process environment variables take precedence.
+Start PostgreSQL before running the API; see MEN-16 below.
+Never commit `.env` files or real credentials.
 
 The existing `Dockerfile` builds the application with Maven and runs the JAR on
-port 8080. The `/actuator/health` endpoint is not provided by MEN-11; health checks
-are part of MEN-13.
+port 8080. Its Compose health check uses `/actuator/health`.
+
+## Repository setup (MEN-12)
+
+The current monorepo separates `backend/` from `frontend/web/` and
+`frontend/landing/`. Maven Wrapper, `pom.xml`, Java sources, the Dockerfile,
+Compose and `.env.example` are inside `backend/`, not the repository root.
+
+The Jira task names `feature/backend-core` as the base work branch. From the
+monorepo root, update it without rewriting history:
+
+```bash
+git fetch origin
+git switch feature/backend-core
+git merge --ff-only origin/develop
+```
+
+For a fresh clone, first create the local tracking branch with
+`git switch --track origin/feature/backend-core`. If fast-forward fails, inspect
+the divergent changes; do not reset or force-push the branch.
+
+Create `backend/.env` from `backend/.env.example` only if it does not already
+exist. Set the four required local passwords (`POSTGRES_PASSWORD`,
+`MONGO_PASSWORD`, `REDIS_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`) outside Git.
+From `backend/`, validate all Compose profiles without starting containers:
+
+```bash
+docker compose --profile app --profile automation config --quiet
+```
+
+The template documents the variables used by Compose and direct local runs. `.env` and `.env.local` are ignored. Validation of this setup
+does not establish connectivity to databases, Keycloak or payment/video
+providers; those integrations remain in their implementation tasks.
+
+## API checks and documentation (MEN-15)
+
+Run from `backend/`. Copy `.env.example` to `.env` if needed and activate the
+`local` profile as shown above. `SERVER_PORT` defaults to 8080;
+`CORS_ALLOWED_ORIGINS` is a comma-separated list of exact frontend origins,
+for example `http://localhost:5173,http://127.0.0.1:5173`.
+
+| URL | Expected result |
+| --- | --- |
+| `http://localhost:8080/api/v1/hello` | HTTP 200 and `{"message":"Mentor backend is running"}`. |
+| `http://localhost:8080/actuator/health` | HTTP 200 and `status: UP`; no component details or secrets. Health group names may also be present. |
+| `http://localhost:8080/v3/api-docs` | OpenAPI JSON with Mentor API metadata and `/api/v1/hello`. |
+| `http://localhost:8080/swagger-ui/index.html` | Swagger UI served by this application. `/swagger-ui.html` redirects to it. |
+
+Only the health actuator is exposed. API CORS accepts configured origins and
+rejects unlisted origins; wildcard origins are not accepted. Bearer-token
+headers are allowed without enabling cross-origin cookie credentials.
+Socket.IO will have its own origin policy when implemented.
+
+Health and documentation are public for this bootstrap task. The Keycloak
+security task must apply the agreed environment/role policy for documentation
+and business routes; it must not expose additional management endpoints.
+Health now includes PostgreSQL connectivity in its aggregate status, while component details stay hidden. Other provider connectivity remains outside this task.
+
+```powershell
+Invoke-RestMethod http://localhost:8080/actuator/health
+Invoke-RestMethod http://localhost:8080/api/v1/hello
+```
+
+With Docker running, run `./mvnw verify` (or `.\mvnw.cmd verify` on Windows) for PostgreSQL startup and HTTP
+smoke tests: health, restricted management exposure, hello contract, OpenAPI,
+Swagger UI, allowed/blocked origins and CORS preflight.
+
+## PostgreSQL connection (MEN-16)
+
+Spring Data JPA uses the PostgreSQL JDBC driver and HikariCP; dependency
+versions are managed by Spring Boot. Set these values in your ignored `.env`:
+
+| Variable | Purpose / default |
+| --- | --- |
+| `POSTGRES_HOST` | Database host for direct JVM runs; `localhost`. |
+| `POSTGRES_PORT` | Database port for direct JVM runs; `5432`. |
+| `POSTGRES_DB` | Database name; `mentor`. |
+| `POSTGRES_USER` | Database user; `mentor`. |
+| `POSTGRES_PASSWORD` | Required password you set locally; no supplied secret. |
+| `SPRING_DATASOURCE_URL` | Optional full JDBC URL override, including hosted PostgreSQL options. |
+| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Optional matching credential overrides. |
+
+For local Compose, also fill the other required password placeholders in
+`.env` because Compose validates the full file even when starting one service.
+From `backend/`:
+
+```bash
+docker compose up -d postgres
+docker compose ps postgres
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+On PowerShell, use `.\mvnw.cmd` instead of `./mvnw`. With PostgreSQL ready,
+the log should show the connection pool and JPA EntityManagerFactory starting;
+`/actuator/health` should return HTTP 200 with `status: UP`.
+Compose passes `SPRING_DATASOURCE_*` for its internal `postgres:5432` address;
+do not use `localhost` for the database host inside the backend container.
+For hosted databases, set the provider JDBC URL and TLS options plus credentials
+through the environment. This task does not provision a Supabase instance.
+
+Hibernate automatic schema creation/update is disabled (`ddl-auto=none`),
+and Open Session in View is disabled. No entities, business tables or migrations
+are added. Flyway and `V1__init.sql` belong to MEN-17. With incorrect credentials
+or an unreachable database, startup fails; do not treat a disconnected API as healthy.
+
+`mvn verify` requires Docker: Testcontainers starts PostgreSQL 16 with ephemeral
+credentials and random ports, runs `SELECT 1`, checks JPA initialization and
+runs the existing HTTP checks against the connected application. It does not
+use your local `.env`, database or credentials; containers are stopped afterward.
+CI runners already provide Docker. Reference:
+[Spring Boot SQL configuration](https://docs.spring.io/spring-boot/reference/data/sql.html)
+and [Testcontainers service connections](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html).
 
 ## Branches and workflow
 

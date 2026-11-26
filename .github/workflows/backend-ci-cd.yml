@@ -2,7 +2,10 @@ name: Backend CI/CD
 
 # CI: runs on every Pull Request to develop or main (build + tests).
 # CD: runs when a Pull Request is merged (push) into develop (QA) or main (production).
-#     Production waits for the manual approval configured in the "production" environment.
+#     develop: build the image once, tag it with the commit, push it to Docker Hub, deploy it to QA (ECS Fargate).
+#     main:    promote the SAME image that was validated in QA (no rebuild) and deploy it to production (ECS Fargate).
+#              Production waits for the manual approval configured in the "production" environment.
+#     Every external step is skipped with a notice while its secrets or variables are missing.
 
 on:
   pull_request:
@@ -20,7 +23,7 @@ concurrency:
 permissions:
   contents: read
 
-# Monorepo: the backend lives in backend
+# Monorepo: the backend lives in backend. Jobs that do not check out the code (CI passed, deploys) override this.
 defaults:
   run:
     working-directory: backend
@@ -70,41 +73,169 @@ jobs:
   ci-ok:
     name: CI passed
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     needs: [backend, docker-compose]
     steps:
       - run: echo "All CI checks passed."
 
   # ---------------- CD ----------------
-  deploy-qa:
-    name: Deploy to QA
+  publish-image:
+    name: Publish image to Docker Hub
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: ci-ok
     runs-on: ubuntu-latest
-    environment: qa
+    defaults:
+      run:
+        working-directory: .
+    env:
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - name: Trigger deploy on Render
-        env:
-          RENDER_DEPLOY_HOOK_BACKEND: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+      - name: Check the Docker Hub configuration
+        id: cfg
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_BACKEND" ]; then
-            echo "RENDER_DEPLOY_HOOK_BACKEND is not configured in the qa environment yet. Skipping."
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "DOCKERHUB_USERNAME / DOCKERHUB_TOKEN are not configured yet. Skipping the image publication."
           else
-            curl -fsS -X POST "$RENDER_DEPLOY_HOOK_BACKEND"
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.configured == 'true'
+
+      - name: Log in to Docker Hub
+        if: steps.cfg.outputs.configured == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push the image (tagged with the commit)
+        if: steps.cfg.outputs.configured == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/mentor-backend:${{ github.sha }}
+            ${{ vars.DOCKERHUB_USERNAME }}/mentor-backend:qa
+
+  deploy-qa:
+    name: Deploy to QA
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: publish-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: .
+    environment: qa
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE_BACKEND }}
+      IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/mentor-backend:${{ github.sha }}
+    steps:
+      - name: Check the AWS configuration
+        id: cfg
+        run: |
+          if [ -z "$AWS_ROLE_ARN" ] || [ -z "$AWS_REGION" ] || [ -z "$ECS_CLUSTER" ] || [ -z "$ECS_SERVICE" ] || [ -z "${{ vars.DOCKERHUB_USERNAME }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "AWS_ROLE_ARN / AWS_REGION / ECS_CLUSTER / ECS_SERVICE_BACKEND are not configured in the qa environment yet. Skipping the deploy."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure AWS credentials (OIDC)
+        if: steps.cfg.outputs.configured == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy the image to ECS Fargate
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].taskDefinition' --output text)
+          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query taskDefinition \
+            | jq --arg IMAGE "$IMAGE" '.containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)' > taskdef.json
+          NEW_ARN=$(aws ecs register-task-definition --cli-input-json file://taskdef.json --query 'taskDefinition.taskDefinitionArn' --output text)
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --task-definition "$NEW_ARN" > /dev/null
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"
 
   deploy-production:
     name: Deploy to production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: ci-ok
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: .
     environment: production
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE_BACKEND }}
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - name: Trigger deploy on Render
-        env:
-          RENDER_DEPLOY_HOOK_BACKEND: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+      - name: Check the configuration
+        id: cfg
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_BACKEND" ]; then
-            echo "RENDER_DEPLOY_HOOK_BACKEND is not configured in the production environment yet. Skipping."
+          if [ -z "$AWS_ROLE_ARN" ] || [ -z "$AWS_REGION" ] || [ -z "$ECS_CLUSTER" ] || [ -z "$ECS_SERVICE" ] || [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "AWS and Docker Hub are not configured in the production environment yet. Skipping the deploy."
           else
-            curl -fsS -X POST "$RENDER_DEPLOY_HOOK_BACKEND"
+            echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.configured == 'true'
+        with:
+          fetch-depth: 2
+
+      - name: Find the image validated in QA
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          # main receives develop through a merge commit: its second parent is the develop commit already built and tested in QA.
+          PROMOTED_SHA=$(git rev-parse --verify -q HEAD^2 || git rev-parse HEAD)
+          echo "PROMOTED_SHA=$PROMOTED_SHA" >> "$GITHUB_ENV"
+          echo "IMAGE=$DOCKERHUB_USERNAME/mentor-backend:$PROMOTED_SHA" >> "$GITHUB_ENV"
+
+      - name: Log in to Docker Hub
+        if: steps.cfg.outputs.configured == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag the same image as production (no rebuild)
+        if: steps.cfg.outputs.configured == 'true'
+        run: docker buildx imagetools create -t "$DOCKERHUB_USERNAME/mentor-backend:production" "$IMAGE"
+
+      - name: Configure AWS credentials (OIDC)
+        if: steps.cfg.outputs.configured == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy the image to ECS Fargate
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].taskDefinition' --output text)
+          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query taskDefinition \
+            | jq --arg IMAGE "$IMAGE" '.containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)' > taskdef.json
+          NEW_ARN=$(aws ecs register-task-definition --cli-input-json file://taskdef.json --query 'taskDefinition.taskDefinitionArn' --output text)
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --task-definition "$NEW_ARN" > /dev/null
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"

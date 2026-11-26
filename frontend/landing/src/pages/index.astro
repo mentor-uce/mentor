@@ -1,0 +1,48 @@
+---
+/**
+ * Index Page (Landing Page Home)
+ *
+ * Assembles the full suite of Mentor landing page organisms:
+ * 1. HeroSection: Display headline, value proposition, and mobile card preview from Brand Manual
+ * 2. ProblemSection: High costs & chaotic chat groups vs. Mentor's structured platform
+ * 3. HowItWorksSection: 4-step student flow & 5-step tutor flow
+ * 4. BenefitsSection: 6 core benefits of peer learning
+ * 5. TrustSection: Dark trust section with UCE verification and completion code security
+ * 6. FAQSection: 8 questions answering common student and tutor inquiries
+ * 7. FinalCTASection: Action banner with Cinta gradient to sign up or log in
+ */
+import PublicLayout from '../layouts/PublicLayout.astro';
+import HeroSection from '../components/organisms/HeroSection.astro';
+import ProblemSection from '../components/organisms/ProblemSection.astro';
+import HowItWorksSection from '../components/organisms/HowItWorksSection.astro';
+import BenefitsSection from '../components/organisms/BenefitsSection.astro';
+import TrustSection from '../components/organisms/TrustSection.astro';
+import FAQSection from '../components/organisms/FAQSection.astro';
+import FinalCTASection from '../components/organisms/FinalCTASection.astro';
+---
+
+<PublicLayout
+  title="Mentor — Enseñar también es aprender | Tutorías entre pares UCE"
+  description="Conéctate con tutores pares verificados de la Universidad Central del Ecuador. Aprende en comunidad, comparte tu conocimiento y avanza con confianza."
+>
+  <!-- Hero Section -->
+  <HeroSection />
+
+  <!-- Problem Section -->
+  <ProblemSection />
+
+  <!-- How It Works Section (Student Flow & Tutor Flow) -->
+  <HowItWorksSection />
+
+  <!-- Benefits Section -->
+  <BenefitsSection />
+
+  <!-- Trust and Security Section -->
+  <TrustSection />
+
+  <!-- FAQ Section -->
+  <FAQSection />
+
+  <!-- Final Call to Action Section -->
+  <FinalCTASection />
+</PublicLayout>

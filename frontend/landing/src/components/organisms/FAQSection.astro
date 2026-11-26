@@ -1,0 +1,92 @@
+---
+/**
+ * FAQSection Organism
+ *
+ * Implements accessible accordion items addressing the 8 core questions
+ * about Mentor as defined in Document 00 and Document 08:
+ * 1. ¿Qué es Mentor?
+ * 2. ¿Quiénes pueden utilizar Mentor?
+ * 3. ¿Cómo puedo convertirme en tutor?
+ * 4. ¿Las tutorías son gratuitas o tienen costo?
+ * 5. ¿Cómo funcionan las solicitudes de tutoría?
+ * 6. ¿Cómo se completan las sesiones de tutoría?
+ * 7. ¿Cómo funciona la verificación de correo electrónico?
+ * 8. ¿Mentor procesa pagos reales?
+ */
+import Container from '../atoms/Container.astro';
+import FAQItem from '../molecules/FAQItem.astro';
+
+const faqs = [
+  {
+    question: '1. ¿Qué es Mentor?',
+    answer:
+      'Mentor es una plataforma web de tutorías académicas entre pares diseñada específicamente para la comunidad estudiantil de la Universidad Central del Ecuador (UCE). Conecta a estudiantes que necesitan reforzar materias complejas con compañeros destacados que ya las aprobaron y desean enseñar.',
+    open: true,
+  },
+  {
+    question: '2. ¿Quiénes pueden utilizar Mentor?',
+    answer:
+      'Mentor está dirigido a estudiantes de pregrado matriculados en la Universidad Central del Ecuador que cuenten con una cuenta de correo electrónico institucional activa (@uce.edu.ec).',
+  },
+  {
+    question: '3. ¿Cómo puedo convertirme en tutor?',
+    answer:
+      'Una vez registrado y verificado tu correo institucional, puedes activar el "Modo Tutor" desde tu panel de perfil. No pierdes tu condición de estudiante: con una sola cuenta puedes solicitar tutorías o impartirlas según tus materias aprobadas.',
+  },
+  {
+    question: '4. ¿Las tutorías son gratuitas o tienen costo?',
+    answer:
+      'Los tutores pueden ofrecer tutorías solidarias gratuitas o establecer una tarifa por hora por su tiempo y dedicación académica. Todas las transacciones se realizan mediante Stripe en modo de prueba estrictamente académico.',
+  },
+  {
+    question: '5. ¿Cómo funcionan las solicitudes de tutoría?',
+    answer:
+      'El estudiante busca la materia y tutor de su interés, elige fecha, hora y modalidad (presencial u online) y envía la solicitud. El tutor recibe la notificación y confirma la reserva según su disponibilidad horaria.',
+  },
+  {
+    question: '6. ¿Cómo se confirman y completan las sesiones?',
+    answer:
+      'Al terminar la clase, el estudiante le facilita un código seguro de finalización de 6 dígitos al tutor. Al ingresar este código en la plataforma, la tutoría se marca oficialmente como realizada, habilitando la calificación y reseña.',
+  },
+  {
+    question: '7. ¿Cómo funciona la verificación de correo electrónico?',
+    answer:
+      'Al registrarte, enviamos un enlace de validación a tu dirección @uce.edu.ec. Al confirmar tu bandeja de entrada aseguras tu pertenencia activa a la Universidad Central del Ecuador antes de agendar o publicar sesiones.',
+  },
+  {
+    question: '8. ¿Mentor procesa pagos reales o cobra a tarjetas de crédito?',
+    answer:
+      'No. Mentor no realiza cobros con dinero real. La pasarela de pago con Stripe está configurada exclusivamente en entorno sandbox / pruebas con fines didácticos y de evaluación para la cátedra de Arquitectura de Software.',
+  },
+];
+---
+
+<section id="faq" class="py-16 md:py-24 bg-slate-50/50 border-t border-slate-100">
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
+      >
+        Preguntas y Respuestas
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
+        Preguntas Frecuentes
+      </h2>
+      <p class="text-base text-slate-600 leading-relaxed">
+        Todo lo que necesitas saber sobre el funcionamiento, seguridad y políticas de tutorías entre pares en Mentor.
+      </p>
+    </div>
+
+    <div class="max-w-3xl mx-auto space-y-4">
+      {
+        faqs.map((faq) => (
+          <FAQItem
+            question={faq.question}
+            answer={faq.answer}
+            open={faq.open}
+          />
+        ))
+      }
+    </div>
+  </Container>
+</section>

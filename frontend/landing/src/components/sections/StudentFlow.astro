@@ -1,0 +1,69 @@
+---
+/**
+ * StudentFlow Section
+ *
+ * Explains the 4-step journey for a university student seeking academic tutoring:
+ * 1. Buscar tutorías disponibles (Search for Tutoring Services)
+ * 2. Solicitar una sesión (Request a Tutoring Session)
+ * 3. Recibir la tutoría (Receive the Tutoring Session)
+ * 4. Calificar al tutor (Review the Tutor)
+ */
+import StepCard from '../molecules/StepCard.astro';
+
+const studentSteps = [
+  {
+    stepNumber: 1,
+    title: 'Buscar tutorías disponibles',
+    description:
+      'Explora materias, facultades y temas impartidos por compañeros que ya cursaron y aprobaron con excelencia la asignatura.',
+  },
+  {
+    stepNumber: 2,
+    title: 'Solicitar una sesión',
+    description:
+      'Elige el horario y modalidad (presencial u online) que mejor se adapte a tu cronograma y envía una solicitud estructurada.',
+  },
+  {
+    stepNumber: 3,
+    title: 'Recibir la tutoría',
+    description:
+      'Conéctate o asiste al punto de encuentro en la facultad para resolver dudas puntuales con explicaciones directas entre pares.',
+  },
+  {
+    stepNumber: 4,
+    title: 'Calificar al tutor',
+    description:
+      'Proporciona el código de finalización y deja tu reseña y puntuación para fortalecer la confianza de la comunidad estudiantil.',
+  },
+];
+---
+
+<div class="flex flex-col h-full bg-slate-50/70 p-6 md:p-8 rounded-2xl border border-slate-200">
+  <div class="flex items-center gap-3 mb-6">
+    <span
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-sky/20 text-mentor-night border border-mentor-sky/30 uppercase tracking-wide"
+    >
+      Ruta del Estudiante
+    </span>
+    <h3 class="text-xl font-heading font-bold text-mentor-night">
+      Cómo aprender con un compañero
+    </h3>
+  </div>
+
+  <p class="text-sm text-slate-600 mb-6">
+    Recibe apoyo accesible en las asignaturas más desafiantes guiado por estudiantes que conocen los requerimientos reales de tu carrera.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+    {
+      studentSteps.map((step) => (
+        <StepCard
+          stepNumber={step.stepNumber}
+          title={step.title}
+          description={step.description}
+          roleVariant="student"
+        />
+      ))
+    }
+  </div>
+</div>

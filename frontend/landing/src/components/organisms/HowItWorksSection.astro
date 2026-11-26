@@ -1,0 +1,37 @@
+---
+/**
+ * HowItWorksSection Organism
+ *
+ * Houses both the StudentFlow and TutorFlow journeys, explaining
+ * the end-to-end peer tutoring lifecycle.
+ */
+import Container from '../atoms/Container.astro';
+import StudentFlow from '../sections/StudentFlow.astro';
+import TutorFlow from '../sections/TutorFlow.astro';
+---
+
+<section id="how-it-works" class="py-16 md:py-24 bg-slate-50/50 border-t border-slate-100">
+  <Container>
+    <div class="max-w-3xl mx-auto text-center mb-14">
+      <span
+        class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
+      >
+        Experiencia Paso a Paso
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
+        ¿Cómo funciona Mentor?
+      </h2>
+      <p class="text-base text-slate-600 leading-relaxed">
+        Tanto si buscas resolver dudas en asignaturas complejas como si estás listo para compartir lo que sabes, Mentor te ofrece un camino claro, ordenado y seguro.
+      </p>
+    </div>
+
+    <div class="space-y-10">
+      <!-- Student Flow Organism -->
+      <StudentFlow />
+
+      <!-- Tutor Flow Organism -->
+      <TutorFlow />
+    </div>
+  </Container>
+</section>
