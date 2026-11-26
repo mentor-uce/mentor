@@ -1,4 +1,4 @@
-name: CI/CD
+name: Backend CI/CD
 
 # CI: runs on every Pull Request to develop or main (build + tests).
 # CD: runs when a Pull Request is merged (push) into develop (QA) or main (production).
@@ -7,16 +7,23 @@ name: CI/CD
 on:
   pull_request:
     branches: [develop, main]
+    paths: ['apps/backend/**', 'apps/gateway/**', 'packages/contracts/**', '.github/workflows/backend-ci-cd.yml']
   push:
     branches: [develop, main]
+    paths: ['apps/backend/**', 'apps/gateway/**', 'packages/contracts/**', '.github/workflows/backend-ci-cd.yml']
   workflow_dispatch:
 
 concurrency:
-  group: ci-cd-${{ github.ref }}
+  group: backend-ci-cd-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
+
+# Monorepo: the backend lives in apps/backend
+defaults:
+  run:
+    working-directory: apps/backend
 
 jobs:
   # ---------------- CI ----------------
@@ -38,6 +45,7 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+          cache-dependency-path: apps/backend/pom.xml
 
       - name: Build and test (JUnit)
         if: steps.exists.outputs.found == 'true'
