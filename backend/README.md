@@ -460,3 +460,17 @@ socket.on("pong", console.log); // "pong"
 The server reuses the REST JWT validator (RS256, issuer, audience, required claims). It rejects untrusted browser origins, missing/invalid tokens and URL tokens; only explicit configured CORS origins are accepted. A connected token is checked on each ping and disconnected at expiry (idle connections within one second). Refresh through Keycloak and reconnect with the new auth token. TLS belongs at the trusted gateway in hosted environments; do not expose this plain local transport publicly.
 
 This task provides an authenticated ping/pong scaffold, not chat, business-room access, account-state reconciliation, persistence or Redis distribution between replicas. Those require their own business use cases and integration evidence. The Java Socket.IO2.1.2 protocol client is exercised against netty-socketio2.0.14 in HTTP integration tests; a raw WebSocket echo is not used as a substitute.
+
+## Payment and video scaffolds (MEN-24)
+
+`PAYMENT_PROVIDER=SIMULATED` and `VIDEO_PROVIDER=DUMMY` are the only implemented modes. Existing local `.env` files using `kushki` or `webrtc` must be updated; unsupported modes intentionally fail startup instead of silently claiming that an external provider works. Domain ports let future adapters replace these scaffolds.
+
+`GET /api/v1/payments/status` requires a valid Keycloak access token and returns:
+
+```json
+{"provider":"SIMULATED","testMode":true,"chargesEnabled":false}
+```
+
+Anonymous calls return401. This read-only endpoint exposes no credentials, checkout URL or transaction. The scaffold cannot charge, refund, transfer money or approve a payment. Stripe sandbox remains the target for a later integration; setting `PAYMENT_PROVIDER=STRIPE` is rejected until that adapter is implemented.
+
+`VideoProvider.createRoom(UUID bookingId)` currently returns a deterministic dummy room with `provider=DUMMY`, `testMode=true` and `joinable=false`, without an access URL or external request. It does not grant booking/room access or create a real conference. Selecting and implementing an external provider and participant authorization are later business tasks.

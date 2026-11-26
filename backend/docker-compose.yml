@@ -113,8 +113,8 @@ services:
       SOCKET_IO_ENABLED: ${SOCKET_IO_ENABLED:-true}
       SOCKET_IO_HOST: 0.0.0.0
       SOCKET_IO_PORT: 9092
-      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-webrtc}
-      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-kushki}
+      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-DUMMY}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-SIMULATED}
     env_file:
       - path: .env
         required: false
