@@ -56,7 +56,7 @@ public class SecurityConfiguration {
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/api/v1/hello",
-                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").permitAll()
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                         .requestMatchers("/actuator/**").denyAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resource -> resource.jwt(jwt -> jwt.jwtAuthenticationConverter(authentication)))

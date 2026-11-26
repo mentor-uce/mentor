@@ -100,6 +100,13 @@ class BackendHttpSmokeTests {
         assertTrue(allowed.contains("idempotency-key"));
     }
 
+    @Test
+    void openApiYamlRemainsPublic() throws Exception {
+        var response = send(request("/v3/api-docs.yaml").GET().build());
+        assertEquals(200, response.statusCode());
+        assertTrue(response.body().contains("openapi:"));
+    }
+
     private HttpRequest.Builder request(String path) {
         return HttpRequest.newBuilder(URI.create("http://127.0.0.1:"
                 + environment.getRequiredProperty("local.server.port") + path))

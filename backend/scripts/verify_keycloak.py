@@ -194,6 +194,7 @@ def verify_backend(backend_jar, issuer, tokens, expect_me=False):
     suffix = secrets.token_hex(4)
     names = {service: "mentor-auth-check-" + service + "-" + suffix for service in ("pg", "mongo", "redis")}
     process = None
+    owned_container_ids = []
     password = secrets.token_hex(24)
     manager = tempfile.TemporaryDirectory(prefix="mentor-auth-")
     try:
@@ -206,8 +207,8 @@ def verify_backend(backend_jar, issuer, tokens, expect_me=False):
             ("pg", "postgres:16-alpine", 5432, []),
             ("mongo", "mongo:7", 27017, []),
             ("redis", "redis:7-alpine", 6379, ["sh", "-c", 'exec redis-server --requirepass "$REDIS_PASSWORD" --save "" --appendonly no'])):
-            docker("run", "-d", "--rm", "--name", names[service], "--env-file", str(env_file),
-                   "-p", "127.0.0.1::" + str(port), image, *command)
+            owned_container_ids.append(docker("run", "-d", "--rm", "--name", names[service], "--env-file", str(env_file),
+                   "-p", "127.0.0.1::" + str(port), image, *command))
         ports = {service: docker("port", names[service], str(port) + "/tcp").split(":")[-1]
                  for service, port in (("pg", 5432), ("mongo", 27017), ("redis", 6379))}
         ready = False
@@ -283,7 +284,7 @@ def verify_backend(backend_jar, issuer, tokens, expect_me=False):
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
-        for name in names.values():
+        for name in owned_container_ids:
             subprocess.run(["docker", "rm", "-f", name], capture_output=True)
         manager.cleanup()
 
