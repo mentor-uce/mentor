@@ -24,3 +24,5 @@
 Dockerfile              @sarithmijal
 nginx.conf              @sarithmijal
 .dockerignore           @sarithmijal
+docker-compose*.yml     @sarithmijal
+/apps/backend/docker/   @sarithmijal
