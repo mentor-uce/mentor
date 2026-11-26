@@ -2,15 +2,15 @@
 
 Peer tutoring platform for Universidad Central del Ecuador. Final project of the Software Architecture and Programming in English courses.
 
-Monorepo: one repository for the whole project.
+Monorepo: one repository, with the backend and the frontend in separate folders.
 
 | Folder | Content |
 | --- | --- |
-| `apps/backend` | Spring Boot API (Java 21, modular monolith with DDD) and local Docker Compose |
-| `apps/web-shell` | Web application (React + Vite + TypeScript) |
-| `apps/landing` | Landing page (Astro) |
+| `backend/` | Spring Boot API (Java 21, modular monolith with DDD) and local Docker Compose |
+| `frontend/web/` | Web application (React + Vite + TypeScript) |
+| `frontend/landing/` | Landing page (Astro) |
 
-New apps and shared code (gateway, microfrontends, mobile, desktop, packages, infra, tests) are added under `apps/`, `packages/`, `infra/` and `tests/` when their Jira tasks start.
+Each side has its own CI/CD workflow in `.github/workflows/` that runs only when its folder changes.
 
 Documentation (architecture, diagrams, workflow, decisions): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)
 

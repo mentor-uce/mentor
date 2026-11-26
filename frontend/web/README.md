@@ -1,8 +1,8 @@
 # Mentor – Frontend
 
-Mentor web app (React + Vite + TypeScript) and landing page (Astro, in `apps/landing/`). Part of **Mentor – Learn and teach among peers** (Universidad Central del Ecuador).
+Mentor web app (React + Vite + TypeScript) and landing page (Astro, in `frontend/landing/`). Part of **Mentor – Learn and teach among peers** (Universidad Central del Ecuador).
 
-- API and local environment (Docker Compose): `apps/backend` of this monorepo
+- API and local environment (Docker Compose): `backend` of this monorepo
 - **Documentation (architecture, diagrams, workflow): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)**
 
 ## Run locally
@@ -26,4 +26,4 @@ The Vite project goes in the root of this repository (`npm create vite@latest . 
    npm run dev
    ```
 
-The API, databases and Keycloak start from `apps/backend` with `docker compose up -d`.
+The API, databases and Keycloak start from `backend` with `docker compose up -d`.

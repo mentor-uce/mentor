@@ -4,11 +4,11 @@ Mentor API: Spring Boot (Java 21) modular monolith with DDD.
 
 Part of **Mentor – Learn and teach among peers**, a peer-tutoring web platform for students of Universidad Central del Ecuador.
 
-This folder is part of the `mentor` monorepo: the web app and landing page are in `apps/web-shell` and `apps/landing`; Docker Compose is in this folder; the documentation is in Confluence.
+This folder is part of the `mentor` monorepo: the web app and landing page are in `frontend/web` and `frontend/landing`; Docker Compose is in this folder; the documentation is in Confluence.
 
 **Owner:** Alquinga Cristopher (@Cristopher2912)
 
-- Web app and landing page: `apps/web-shell` and `apps/landing` of this monorepo
+- Web app and landing page: `frontend/web` and `frontend/landing` of this monorepo
 - **Documentation (architecture, diagrams, workflow): [Confluence – MENTOR](https://kevinteno11.atlassian.net/wiki/spaces/MEN/pages/65927)**
 
 ## Current implementation (MEN-11)
@@ -63,7 +63,7 @@ Auth, Users, Services, Schedules, Bookings, Sessions, Payments, Messaging, Video
 
 ## Getting started
 
-Run the commands from `apps/backend` of the monorepo, where `pom.xml` lives.
+Run the commands from `backend` of the monorepo, where `pom.xml` lives.
 
 ### Prerequisites
 
@@ -128,7 +128,7 @@ are part of MEN-13.
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/backend-ci-cd.yml` at the root of the monorepo, only for changes in `apps/backend`, `apps/gateway` and `packages/contracts`):
+GitHub Actions (`.github/workflows/backend-ci-cd.yml` at the root of the monorepo, only for changes in `backend`):
 
 - **CI** on every Pull Request to `develop` or `main`: `mvn verify` (build + JUnit). It is skipped until `pom.xml` exists.
 - **CD** after a merge: `develop` deploys to the **qa** environment and `main` to **production** (manual approval).

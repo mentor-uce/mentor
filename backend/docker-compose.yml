@@ -7,7 +7,7 @@
 # Values come from the .env file (copy .env.example to .env). Never commit .env.
 #
 # The "app" profile builds this backend and the web app and landing page from
-# their folders in the monorepo (../web-shell and ../landing).
+# their folders in the monorepo (../frontend/web and ../frontend/landing).
 
 name: mentor
 
@@ -126,7 +126,7 @@ services:
   frontend:
     profiles: ["app"]
     build:
-      context: ../web-shell
+      context: ../frontend/web
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
         VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080/ws}
@@ -142,7 +142,7 @@ services:
   landing:
     profiles: ["app"]
     build:
-      context: ../landing
+      context: ../frontend/landing
       args:
         PUBLIC_APP_URL: ${PUBLIC_APP_URL:-http://localhost:5173}
     restart: unless-stopped

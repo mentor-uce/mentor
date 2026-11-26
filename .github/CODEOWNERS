@@ -4,12 +4,11 @@
 # Default: everything
 *                       @sarithmijal
 
-# Backend and gateway
-/apps/backend/          @Cristopher2912 @Kevin-Moyon
+# Backend
+/backend/          @Cristopher2912 @Kevin-Moyon
 
-# Web, microfrontends and landing
-/apps/web-shell/        @Milisen03Narvaez @Kevin-Moyon
-/apps/landing/          @Milisen03Narvaez @Kevin-Moyon
+# Frontend (web and landing)
+/frontend/            @Milisen03Narvaez @Kevin-Moyon
 
 # CI/CD, Docker, infrastructure and workflows (DevOps)
 /.github/               @sarithmijal
@@ -17,4 +16,4 @@ Dockerfile              @sarithmijal
 nginx.conf              @sarithmijal
 .dockerignore           @sarithmijal
 docker-compose*.yml     @sarithmijal
-/apps/backend/docker/   @sarithmijal
+/backend/docker/   @sarithmijal

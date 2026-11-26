@@ -7,10 +7,10 @@ name: Backend CI/CD
 on:
   pull_request:
     branches: [develop, main]
-    paths: ['apps/backend/**', 'apps/gateway/**', 'packages/contracts/**', '.github/workflows/backend-ci-cd.yml']
+    paths: ['backend/**', '.github/workflows/backend-ci-cd.yml']
   push:
     branches: [develop, main]
-    paths: ['apps/backend/**', 'apps/gateway/**', 'packages/contracts/**', '.github/workflows/backend-ci-cd.yml']
+    paths: ['backend/**', '.github/workflows/backend-ci-cd.yml']
   workflow_dispatch:
 
 concurrency:
@@ -20,10 +20,10 @@ concurrency:
 permissions:
   contents: read
 
-# Monorepo: the backend lives in apps/backend
+# Monorepo: the backend lives in backend
 defaults:
   run:
-    working-directory: apps/backend
+    working-directory: backend
 
 jobs:
   # ---------------- CI ----------------
@@ -45,7 +45,7 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-          cache-dependency-path: apps/backend/pom.xml
+          cache-dependency-path: backend/pom.xml
 
       - name: Build and test (JUnit)
         if: steps.exists.outputs.found == 'true'
