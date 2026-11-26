@@ -1,0 +1,51 @@
+---
+import Icon from '../atoms/Icon.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  icon:
+    | 'academic-cap'
+    | 'book-open'
+    | 'check'
+    | 'arrow-right'
+    | 'chevron-down'
+    | 'shield-check'
+    | 'user-group'
+    | 'sparkles'
+    | 'search'
+    | 'clock'
+    | 'calendar'
+    | 'lock'
+    | 'star';
+  badge?: string;
+  class?: string;
+}
+
+const { title, description, icon, badge, class: className = '' } = Astro.props;
+---
+
+<div
+  class={`relative flex flex-col p-6 bg-white rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-mentor-sky/40 transition-all duration-200 ${className}`}
+>
+  <div class="flex items-center justify-between mb-4">
+    <div
+      class="w-12 h-12 rounded-lg bg-mentor-ice flex items-center justify-center text-mentor-deep-turquoise"
+    >
+      <Icon name={icon} class="w-6 h-6" />
+    </div>
+    {
+      badge && (
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-mentor-ice text-mentor-deep-turquoise">
+          {badge}
+        </span>
+      )
+    }
+  </div>
+  <h3 class="text-lg font-semibold font-heading text-mentor-night mb-2">
+    {title}
+  </h3>
+  <p class="text-sm text-slate-600 leading-relaxed">
+    {description}
+  </p>
+</div>
