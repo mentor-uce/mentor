@@ -20,7 +20,7 @@ concurrency:
 permissions:
   contents: read
 
-# Monorepo: the backend lives in backend
+# Monorepo: the backend lives in backend. Jobs that do not check out the code (CI passed, deploys) override this.
 defaults:
   run:
     working-directory: backend
@@ -70,6 +70,9 @@ jobs:
   ci-ok:
     name: CI passed
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     needs: [backend, docker-compose]
     steps:
       - run: echo "All CI checks passed."
@@ -80,6 +83,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: ci-ok
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     environment: qa
     steps:
       - name: Trigger deploy on Render
@@ -97,6 +103,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: ci-ok
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     environment: production
     steps:
       - name: Trigger deploy on Render
