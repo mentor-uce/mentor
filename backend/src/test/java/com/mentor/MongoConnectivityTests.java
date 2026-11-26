@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class})
+@Import({PostgreSqlTestConfiguration.class, MongoDbTestConfiguration.class, RedisTestConfiguration.class})
 class MongoConnectivityTests {
 
     @Autowired

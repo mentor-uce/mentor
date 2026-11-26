@@ -23,7 +23,7 @@ This folder is part of the `mentor` monorepo: the web app and landing page are i
 - Spring Data MongoDB with an authenticated connection and health integration
 - HTTP smoke and startup connectivity tests against temporary PostgreSQL containers
 
-Healthy operation now requires reachable PostgreSQL and MongoDB databases and their credentials. Keycloak and payment integrations remain planned.
+Healthy operation now requires reachable PostgreSQL, MongoDB and Redis services and their credentials. Keycloak and payment integrations remain planned.
 Business modules and external integrations remain in their respective Jira tasks. The root `/` remains unmapped; use `/api/v1/hello` for an API check.
 
 ## Target tech stack
@@ -199,8 +199,8 @@ For local Compose, also fill the other required password placeholders in
 From `backend/`:
 
 ```bash
-docker compose up -d postgres mongo
-docker compose ps postgres mongo
+docker compose up -d postgres mongo redis
+docker compose ps postgres mongo redis
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
@@ -286,8 +286,8 @@ provider's TLS and replica-set options in its URI. Do not put real URIs in Git.
 From `backend/`, after filling the required local passwords:
 
 ```bash
-docker compose up -d postgres mongo
-docker compose ps postgres mongo
+docker compose up -d postgres mongo redis
+docker compose ps postgres mongo redis
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
@@ -305,6 +305,26 @@ Use separate limited users for hosted environments; the Compose root user is
 for the local development setup.
 
 Reference: [Spring Boot MongoDB configuration](https://docs.spring.io/spring-boot/reference/data/nosql.html).
+
+## Redis cache connectivity (MEN-19)
+
+Spring Data Redis uses Lettuce and `spring.data.redis.*`. In the local-profile
+`.env`, set `REDIS_HOST` (localhost), `REDIS_PORT` (6379) and `REDIS_PASSWORD`.
+Compose passes its internal hostname and password through `SPRING_DATA_REDIS_*`.
+Real process variables override file values. No secret is supplied in Git.
+
+Start Redis alongside PostgreSQL and MongoDB before checking health. The aggregate
+health response includes Redis; authentication/connectivity failures return
+HTTP 503/DOWN without component details. Command and connection timeouts are 2s.
+Redis client creation is lazy and is not a promise that startup checks credentials.
+
+The real-container test uses the configured `StringRedisTemplate`: writes a
+unique key with a one-minute TTL, reads the exact value, checks finite expiry
+and PONG, then removes only its key. Business cache policies remain with their
+modules. Redis repositories are disabled. Local Compose disables snapshots and
+append-only persistence; Redis is a disposable cache, not business storage. Its /data directory uses tmpfs, so recreating the container cannot reload an old dump. Existing redis-data volumes are left untouched and unmounted.
+
+Reference: [Spring Boot Redis](https://docs.spring.io/spring-boot/reference/data/nosql.html).
 
 ## Branches and workflow
 
