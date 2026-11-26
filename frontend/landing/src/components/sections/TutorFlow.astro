@@ -1,36 +1,46 @@
 ---
+/**
+ * TutorFlow Section
+ *
+ * Explains the 5-step journey for a student acting as an academic tutor:
+ * 1. Activar Modo Tutor (Activate Tutor Mode)
+ * 2. Publicar oferta de tutoría (Publish a Tutoring Service)
+ * 3. Definir disponibilidad (Define Availability)
+ * 4. Confirmar solicitud (Confirm a Request)
+ * 5. Finalizar con código (Complete with Completion Code)
+ */
 import StepCard from '../molecules/StepCard.astro';
 
 const tutorSteps = [
   {
     stepNumber: 1,
-    title: 'Activate Tutor Mode',
+    title: 'Activar Modo Tutor',
     description:
-      'Any verified UCE student can unlock tutor capabilities directly from their account without losing student features.',
+      'Cualquier estudiante verificado de la UCE puede activar el rol de tutor desde su perfil sin perder sus privilegios de estudiante.',
   },
   {
     stepNumber: 2,
-    title: 'Publish a Tutoring Service',
+    title: 'Publicar oferta de tutoría',
     description:
-      'Create listings detailing the subjects you master, focus topics, syllabus scope, and session guidelines.',
+      'Registra las asignaturas que dominas, temas clave a reforzar, modalidad y condiciones de la sesión.',
   },
   {
     stepNumber: 3,
-    title: 'Define Availability',
+    title: 'Definir disponibilidad',
     description:
-      'Set flexible weekly schedules and time windows that align comfortably with your academic commitments.',
+      'Establece tus franjas horarias y días disponibles para coordinar sesiones sin descuidar tus propias clases.',
   },
   {
     stepNumber: 4,
-    title: 'Confirm a Request',
+    title: 'Confirmar solicitud',
     description:
-      'Review pending session bookings from fellow students and confirm sessions in one centralized dashboard.',
+      'Revisa las reservas solicitadas por compañeros y acéptalas con un clic desde tu panel de tutor.',
   },
   {
     stepNumber: 5,
-    title: 'Complete with Completion Code',
+    title: 'Finalizar con código',
     description:
-      'Deliver the tutoring session and finalize the encounter securely using a unique verification code provided by the student.',
+      'Imparte la tutoría e ingresa el código de 6 dígitos que te entrega el estudiante para registrar la sesión como completada.',
   },
 ];
 ---
@@ -40,15 +50,15 @@ const tutorSteps = [
     <span
       class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-turquoise/25 text-mentor-deep-turquoise border border-mentor-turquoise/40 uppercase tracking-wide"
     >
-      Tutor Journey
+      Ruta del Tutor
     </span>
     <h3 class="text-xl font-heading font-bold text-mentor-night">
-      How to Share Your Knowledge
+      Cómo compartir tu conocimiento
     </h3>
   </div>
 
   <p class="text-sm text-slate-600 mb-6">
-    Strengthen your own mastery by teaching others. Earn academic recognition and share your expertise within the UCE community.
+    Consolida tu aprendizaje al enseñar a otros. Gana reconocimiento académico y apoya a la comunidad de la UCE.
   </p>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
@@ -68,7 +78,7 @@ const tutorSteps = [
   <div class="mt-6 p-3.5 bg-mentor-ice/60 rounded-lg border border-mentor-sky/20 flex items-center gap-3">
     <div class="w-2 h-2 rounded-full bg-mentor-deep-turquoise shrink-0"></div>
     <p class="text-xs text-slate-700">
-      <strong class="text-mentor-night">Dual Role Flexibility:</strong> Becoming a tutor does not replace your student status. A single verified account lets you learn and teach whenever you need.
+      <strong class="text-mentor-night">Flexibilidad de rol dual:</strong> Ser tutor no te quita tu rol de estudiante. Con una sola cuenta institucional puedes aprender y enseñar cuando lo decidas.
     </p>
   </div>
 </div>

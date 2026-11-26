@@ -1,30 +1,39 @@
 ---
+/**
+ * StudentFlow Section
+ *
+ * Explains the 4-step journey for a university student seeking academic tutoring:
+ * 1. Buscar tutorías disponibles (Search for Tutoring Services)
+ * 2. Solicitar una sesión (Request a Tutoring Session)
+ * 3. Recibir la tutoría (Receive the Tutoring Session)
+ * 4. Calificar al tutor (Review the Tutor)
+ */
 import StepCard from '../molecules/StepCard.astro';
 
 const studentSteps = [
   {
     stepNumber: 1,
-    title: 'Search for Tutoring Services',
+    title: 'Buscar tutorías disponibles',
     description:
-      'Explore available subjects, faculties, and topics taught by peer students who excelled in those courses.',
+      'Explora materias, facultades y temas impartidos por compañeros que ya cursaron y aprobaron con excelencia la asignatura.',
   },
   {
     stepNumber: 2,
-    title: 'Request a Tutoring Session',
+    title: 'Solicitar una sesión',
     description:
-      'Choose an available time slot matching your schedule and submit a structured session request.',
+      'Elige el horario y modalidad (presencial u online) que mejor se adapte a tu cronograma y envía una solicitud estructurada.',
   },
   {
     stepNumber: 3,
-    title: 'Receive the Tutoring Session',
+    title: 'Recibir la tutoría',
     description:
-      'Connect with your peer tutor for personalized academic support tailored to UCE curriculum standards.',
+      'Conéctate o asiste al punto de encuentro en la facultad para resolver dudas puntuales con explicaciones directas entre pares.',
   },
   {
     stepNumber: 4,
-    title: 'Review the Tutor',
+    title: 'Calificar al tutor',
     description:
-      'Submit feedback and rate the completed session to foster peer accountability and assist fellow classmates.',
+      'Proporciona el código de finalización y deja tu reseña y puntuación para fortalecer la confianza de la comunidad estudiantil.',
   },
 ];
 ---
@@ -34,15 +43,15 @@ const studentSteps = [
     <span
       class="px-3 py-1 rounded-full text-xs font-semibold bg-mentor-sky/20 text-mentor-night border border-mentor-sky/30 uppercase tracking-wide"
     >
-      Student Journey
+      Ruta del Estudiante
     </span>
     <h3 class="text-xl font-heading font-bold text-mentor-night">
-      How to Learn with a Peer
+      Cómo aprender con un compañero
     </h3>
   </div>
 
   <p class="text-sm text-slate-600 mb-6">
-    Get fast, accessible academic support in your difficult courses from students who have already passed them.
+    Recibe apoyo accesible en las asignaturas más desafiantes guiado por estudiantes que conocen los requerimientos reales de tu carrera.
   </p>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">

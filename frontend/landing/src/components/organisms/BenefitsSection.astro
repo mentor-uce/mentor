@@ -1,49 +1,60 @@
 ---
+/**
+ * BenefitsSection Organism
+ *
+ * Details the 6 key advantages of peer-to-peer tutoring in Mentor:
+ * - Explicaciones cercanas entre pares
+ * - Enseñar profundiza el dominio (Enseñar también es aprender)
+ * - Horarios organizados sin chats ruidosos
+ * - Confianza basada en reseñas reales
+ * - Comunidad y conocimiento compartido
+ * - Cuenta única y flexible (Estudiante y Tutor)
+ */
 import Container from '../atoms/Container.astro';
 import FeatureItem from '../molecules/FeatureItem.astro';
 
 const benefits = [
   {
-    title: 'Relatable Peer Explanations',
+    title: 'Explicaciones cercanas entre compañeros',
     description:
-      'Learn from peers who recently passed the same subjects and understand the exact classroom challenges and exam approaches.',
+      'Aprende de compañeros que cursaron recientemente la misma materia y entienden con exactitud el enfoque del docente y los puntos difíciles del examen.',
     icon: 'user-group' as const,
-    badge: 'Peer Support',
+    badge: 'Apoyo entre pares',
   },
   {
-    title: 'Teaching Deepens Mastery',
+    title: 'Enseñar refuerza tu propio dominio',
     description:
-      'Explaining complex concepts to others reinforces your own understanding, strengthening long-term retention and academic confidence.',
+      'Explicar conceptos a otros estudiantes consolida tu comprensión a largo plazo y potencia tus habilidades de comunicación académica.',
     icon: 'academic-cap' as const,
-    badge: 'Dual Growth',
+    badge: 'Crecimiento dual',
   },
   {
-    title: 'Organized & Reliable Scheduling',
+    title: 'Coordinación formal y sin desorden',
     description:
-      'Say goodbye to lost messages in noisy chat groups. Coordinate availability, bookings, and locations within a dedicated interface.',
+      'Olvídate de los mensajes perdidos en grupos de chat multitudinarios. Gestiona solicitudes, modalidades y fechas en una interfaz dedicada.',
     icon: 'calendar' as const,
-    badge: 'Structure',
+    badge: 'Organización',
   },
   {
-    title: 'Trust Built on Feedback',
+    title: 'Confianza y evaluación verificada',
     description:
-      'Ratings and reviews submitted only after verified sessions help you choose experienced tutors with confidence.',
+      'Las calificaciones y reseñas solo pueden emitirse tras finalizar una sesión validada con código, evitando opiniones falsas o anónimas.',
     icon: 'shield-check' as const,
-    badge: 'Accountability',
+    badge: 'Transparencia',
   },
   {
-    title: 'Community-Driven Knowledge',
+    title: 'Comunidad universitaria conectada',
     description:
-      'Build academic networks across faculties and semesters, fostering collaborative learning throughout Universidad Central del Ecuador.',
+      'Construye redes de estudio entre diferentes carreras y semestres dentro de la Universidad Central del Ecuador.',
     icon: 'book-open' as const,
-    badge: 'Community',
+    badge: 'Comunidad UCE',
   },
   {
-    title: 'Flexible Single Account',
+    title: 'Rol dual con una sola cuenta',
     description:
-      'Switch between learning and teaching seamlessly. Activate tutor mode whenever you feel confident in a specific course.',
+      'Alterna entre aprender y enseñar sin crear cuentas separadas. Activa el modo tutor cuando te sientas listo para compartir tu experiencia.',
     icon: 'sparkles' as const,
-    badge: 'Flexibility',
+    badge: 'Flexibilidad',
   },
 ];
 ---
@@ -54,13 +65,13 @@ const benefits = [
       <span
         class="inline-block px-3 py-1 mb-3 text-xs font-semibold uppercase tracking-wider text-mentor-deep-turquoise bg-mentor-ice rounded-full"
       >
-        Platform Advantages
+        Ventajas de la Plataforma
       </span>
       <h2 class="text-3xl sm:text-4xl font-bold font-heading text-mentor-night mb-4">
-        Why Peer Tutoring with Mentor?
+        ¿Por qué elegir tutorías entre pares con Mentor?
       </h2>
       <p class="text-base text-slate-600 leading-relaxed">
-        Peer-to-peer education bridges the gap between formal lectures and personal study, creating an environment where teaching and learning thrive together.
+        El aprendizaje entre pares complementa las clases magistrales con un espacio empático y colaborativo donde enseñar también es aprender.
       </p>
     </div>
 

@@ -1,4 +1,12 @@
 ---
+/**
+ * Icon Component
+ *
+ * Provides optimized SVG icons corresponding to the Mentor Brand Manual
+ * and technical specifications (academic cap, book-open, verify, security, users, etc.).
+ * Includes strict accessibility attributes (aria-hidden="true").
+ */
+
 interface Props {
   name:
     | 'academic-cap'
@@ -15,7 +23,8 @@ interface Props {
     | 'lock'
     | 'star'
     | 'menu'
-    | 'close';
+    | 'close'
+    | 'location';
   class?: string;
   size?: number;
 }
@@ -130,5 +139,12 @@ const { name, class: className = 'w-5 h-5', size = 20 } = Astro.props;
   <svg class={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+)}
+
+{name === 'location' && (
+  <svg class={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 21s-7-7.75-7-12a7 7 0 0 1 14 0c0 4.25-7 12-7 12z" />
+    <circle cx="12" cy="9" r="2.5" />
   </svg>
 )}
