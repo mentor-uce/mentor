@@ -42,7 +42,7 @@ services:
     volumes:
       - mongo-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "const admin = db.getSiblingDB('admin'); admin.auth(process.env.MONGO_INITDB_ROOT_USERNAME, process.env.MONGO_INITDB_ROOT_PASSWORD); if (admin.runCommand({ping: 1}).ok !== 1) quit(1)"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,11 +50,11 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}"]
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}", "--save", "", "--appendonly", "no"]
     ports:
       - "6379:6379"
-    volumes:
-      - redis-data:/data
+    tmpfs:
+      - /data
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
       interval: 10s
@@ -66,7 +66,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     restart: unless-stopped
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm"]
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
@@ -74,10 +74,15 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
+      MENTOR_TEST_STUDENT_PASSWORD: ${MENTOR_TEST_STUDENT_PASSWORD:?Set MENTOR_TEST_STUDENT_PASSWORD in .env}
+      MENTOR_TEST_TUTOR_PASSWORD: ${MENTOR_TEST_TUTOR_PASSWORD:?Set MENTOR_TEST_TUTOR_PASSWORD in .env}
+      MENTOR_TEST_ADMIN_PASSWORD: ${MENTOR_TEST_ADMIN_PASSWORD:?Set MENTOR_TEST_ADMIN_PASSWORD in .env}
       KC_HTTP_PORT: 8080
       KC_HOSTNAME_STRICT: "false"
     ports:
       - "8081:8080"
+    volumes:
+      - ./docker/keycloak/mentor-realm.json:/opt/keycloak/data/import/mentor-realm.json:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,20 +98,29 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-mentor}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-mentor}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_USER:-mentor}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DB:-mentor}?authSource=admin
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGO_DB:-mentor}
+      MONGO_USER: ${MONGO_USER:-mentor}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_AUTH_DATABASE: ${MONGO_AUTH_DATABASE:-admin}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8081/realms/mentor}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-mentor}/protocol/openid-connect/certs
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
-      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-webrtc}
-      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-kushki}
+      SOCKET_IO_ENABLED: ${SOCKET_IO_ENABLED:-true}
+      SOCKET_IO_HOST: 0.0.0.0
+      SOCKET_IO_PORT: 9092
+      VIDEO_PROVIDER: ${VIDEO_PROVIDER:-DUMMY}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-SIMULATED}
     env_file:
       - path: .env
         required: false
     ports:
       - "8080:8080"
+      - "127.0.0.1:9092:9092"
     depends_on:
       postgres:
         condition: service_healthy
@@ -129,7 +143,7 @@ services:
       context: ../frontend/web
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
-        VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080/ws}
+        VITE_WS_URL: ${VITE_WS_URL:-http://localhost:9092}
         VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8081}
         VITE_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-mentor}
         VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-mentor-web}
@@ -174,5 +188,4 @@ services:
 volumes:
   postgres-data:
   mongo-data:
-  redis-data:
   n8n-data:
