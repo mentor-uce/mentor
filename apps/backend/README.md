@@ -38,6 +38,29 @@ no business routes exist yet.
 - JUnit Jupiter and Mockito for tests (versions managed by Spring Boot)
 - Maven as the build tool
 
+## Package structure (MEN-12)
+
+The application root package is `com.mentor`. The following module packages
+each contain `presentation`, `application`, `domain` and `infrastructure`:
+
+`auth`, `users`, `services`, `schedules`, `bookings`, `sessions`, `payments`,
+`messaging`, `video`, `notifications`, `reviews`, `admin` and `shared`.
+
+For example:
+
+```text
+src/main/java/com/mentor/bookings/
+  presentation/package-info.java
+  application/package-info.java
+  domain/package-info.java
+  infrastructure/package-info.java
+```
+
+These packages contain documentation only. `package-info.java` keeps the empty
+layers versioned without adding controllers, entities, use cases or repositories.
+The bootstrap class and its context test use the same root package so Spring can
+discover future module components without configuring a second scan root.
+
 ## Planned modules
 
 Auth, Users, Services, Schedules, Bookings, Sessions, Payments, Messaging, Video, Reviews, Notifications and Admin.
